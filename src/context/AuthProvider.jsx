@@ -133,7 +133,7 @@ function AuthProvider({ children }) {
       window.location.href = "/";
       return () => clearTimeout(timeout);
     } else {
-      toast.error(responseData.message);
+      toast.error("Username or password is incorrect");
     }
   };
 

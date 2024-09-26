@@ -181,9 +181,9 @@ function Header() {
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
 
-                    {(user?.roleName == "Tarot Reader"
+                    {(user?.roleName == "KoiFarm"
                         || user?.roleName == "Customer"
-                        || user?.roleName == "Administrator")
+                        || user?.roleName == "Admin")
                         ? (
                             <>
                                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>

@@ -15,39 +15,39 @@ const kois = [
 
 function Home() {
     return (
-        <div className="min-h-screen mt-5 mb-5">
-
-            {/* Slider Section */}
-            <div className="flex justify-center mb-10">
-                <div className="w-3/4">
-                    <HomeSlider />
+        <div className="min-h-screen bg-gray-100">
+            <div className="pt-10 pb-10">
+                <div className="flex justify-center mb-10">
+                    <div className="w-3/4">
+                        <HomeSlider />
+                    </div>
                 </div>
-            </div>
-
-            {/* Koi Grid Section */}
-            <div className="flex justify-center">
-                <div className="w-3/4">
-                    <div className="grid grid-cols-5 gap-4">
-                        {kois.map((koi, index) => (
-                            <div 
-                                key={index} 
-                                className="border p-3 rounded shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl hover:bg-gray-100"
-                            >
-                                <img 
-                                    src="https://koishop.vn/images/image.php?width=270&image=/admin/sanpham/t0609a007_9325_anh1.jpg"
-                                    alt={koi.name}
-                                    className="mb-3 w-full h-64"
-                                />
-                                <h3 className="text-lg font-bold">{koi.name}</h3>
-                                <p><strong>Farm:</strong> {koi.farm}</p>
-                                <p><strong>Price:</strong> {koi.price}</p>
-                                <p><strong>Gender:</strong> {koi.gender}</p>
-                                <p><strong>Breed:</strong> {koi.breed}</p>
-                            </div>
-                        ))}
+                
+                <div className="flex justify-center">
+                    <div className="w-3/4">
+                        <div className="grid grid-cols-5 gap-4">
+                            {kois.map((koi, index) => (
+                                <div
+                                    key={index}
+                                    className="border p-3 rounded shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl hover:bg-gray-100"
+                                >
+                                    <img
+                                        src="https://koishop.vn/images/image.php?width=270&image=/admin/sanpham/t0609a007_9325_anh1.jpg"
+                                        alt={koi.name}
+                                        className="mb-3 w-full h-64 object-cover" // Thêm object-cover để hình ảnh không bị méo
+                                    />
+                                    <h3 className="text-lg font-bold">{koi.name}</h3>
+                                    <p><strong>Farm:</strong> {koi.farm}</p>
+                                    <p><strong>Price:</strong> {koi.price}</p>
+                                    <p><strong>Gender:</strong> {koi.gender}</p>
+                                    <p><strong>Breed:</strong> {koi.breed}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
     );
 }

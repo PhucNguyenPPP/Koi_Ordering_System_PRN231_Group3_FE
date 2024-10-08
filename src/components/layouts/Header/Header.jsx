@@ -9,13 +9,14 @@ import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import useAuth from '../../../hooks/useAuth';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import { useNavigate } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -61,6 +62,7 @@ function Header() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -80,6 +82,10 @@ function Header() {
 
     const handleMobileMenuOpen = (event) => {
         setMobileMoreAnchorEl(event.currentTarget);
+    };
+
+    const handleCartClick = () => {
+        navigate('/cart');
     };
 
     const menuId = 'primary-search-account-menu';
@@ -187,9 +193,9 @@ function Header() {
                         ? (
                             <>
                                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                                        <Badge badgeContent={4} color="error">
-                                            <MailIcon />
+                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit" onClick={handleCartClick}>
+                                        <Badge>
+                                            <ShoppingCartOutlinedIcon style={{fontSize: '30px'}}/>
                                         </Badge>
                                     </IconButton>
                                     <IconButton
@@ -198,7 +204,7 @@ function Header() {
                                         color="inherit"
                                     >
                                         <Badge badgeContent={17} color="error">
-                                            <NotificationsIcon />
+                                            <NotificationsIcon  style={{fontSize: '30px'}}/>
                                         </Badge>
                                     </IconButton>
                                     <IconButton
@@ -210,7 +216,7 @@ function Header() {
                                         onClick={handleProfileMenuOpen}
                                         color="inherit"
                                     >
-                                        <AccountCircle />
+                                        <AccountCircle style={{fontSize: '30px'}}/>
                                     </IconButton>
                                 </Box>
                                 <Box sx={{ display: { xs: 'flex', md: 'none' } }}>

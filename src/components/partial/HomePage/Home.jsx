@@ -1,52 +1,84 @@
+import { useEffect, useState } from "react";
 import HomeSlider from "./HomeSlider";
-
-const kois = [
-    { name: "Koi 1", farm: "Farm A", price: "$100", gender: "Male", breed: "Breed A" },
-    { name: "Koi 2", farm: "Farm B", price: "$120", gender: "Female", breed: "Breed B" },
-    { name: "Koi 3", farm: "Farm C", price: "$150", gender: "Male", breed: "Breed C" },
-    { name: "Koi 4", farm: "Farm D", price: "$130", gender: "Female", breed: "Breed D" },
-    { name: "Koi 5", farm: "Farm E", price: "$110", gender: "Male", breed: "Breed E" },
-    { name: "Koi 6", farm: "Farm F", price: "$140", gender: "Female", breed: "Breed F" },
-    { name: "Koi 7", farm: "Farm G", price: "$160", gender: "Male", breed: "Breed G" },
-    { name: "Koi 8", farm: "Farm H", price: "$180", gender: "Female", breed: "Breed H" },
-    { name: "Koi 9", farm: "Farm I", price: "$190", gender: "Male", breed: "Breed I" },
-    { name: "Koi 10", farm: "Farm J", price: "$200", gender: "Female", breed: "Breed J" }
-];
+import { GetAllKoi } from "../../../api/KoiApi";
+import { CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
-    return (
-        <div className="min-h-screen mt-5 mb-5">
+    const [koiList, setKoiList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
-            {/* Slider Section */}
-            <div className="flex justify-center mb-10">
-                <div className="w-3/4">
-                    <HomeSlider />
-                </div>
+    useEffect(() => {
+        const fetchAllKoiList = async () => {
+            setIsLoading(true);
+            const response = await GetAllKoi();
+            const responseData = await response.json();
+            if (response.ok) {
+                setKoiList(responseData.result);
+            } else if (response.status === 404) {
+                setKoiList([]);
+            } else {
+                toast.error("Fetch koi failed: " + responseData.message);
+            }
+            setIsLoading(false);
+        };
+
+        fetchAllKoiList();
+    }, []);
+
+    const formatPriceVND = (price) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    };
+
+    const handleKoiDetail = (koiId) => {
+        navigate('/koi-detail', { state: { koiId } });
+    };
+
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 flex justify-center items-center bg-gray-200 z-50">
+                <CircularProgress />
             </div>
+        );
+    }
 
-            {/* Koi Grid Section */}
-            <div className="flex justify-center">
-                <div className="w-3/4">
-                    <div className="grid grid-cols-5 gap-4">
-                        {kois.map((koi, index) => (
-                            <div 
-                                key={index} 
-                                className="border p-3 rounded shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl hover:bg-gray-100"
-                            >
-                                <img 
-                                    src="https://koishop.vn/images/image.php?width=270&image=/admin/sanpham/t0609a007_9325_anh1.jpg"
-                                    alt={koi.name}
-                                    className="mb-3 w-full h-64"
-                                />
-                                <h3 className="text-lg font-bold">{koi.name}</h3>
-                                <p><strong>Farm:</strong> {koi.farm}</p>
-                                <p><strong>Price:</strong> {koi.price}</p>
-                                <p><strong>Gender:</strong> {koi.gender}</p>
-                                <p><strong>Breed:</strong> {koi.breed}</p>
-                            </div>
-                        ))}
+    return (
+        <div className="min-h-screen bg-gray-100">
+            <div className="pt-10 pb-10">
+                <div className="flex justify-center mb-10">
+                    <div className="w-3/4">
+                        <HomeSlider />
                     </div>
                 </div>
+
+                <div className="flex justify-center">
+                    <div className="w-3/4">
+                        <div className="grid grid-cols-5 gap-4">
+                            {koiList && koiList.length > 0 && koiList.map((koi, index) => (
+                                <div
+                                    key={koi.koiId}
+                                    className="border p-3 rounded shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl hover:bg-gray-100"
+                                    onClick={() => handleKoiDetail(koi.koiId)}
+                                >
+                                    <img
+                                        src={koi.avatarLink}
+                                        alt={koi.name}
+                                        className="mb-3 w-full h-fit object-cover"
+                                    />
+                                    <h3 className="text-lg font-bold">{koi.name}</h3>
+                                    <p><strong>Price:</strong> {formatPriceVND(koi.price)}</p>
+                                    <p><strong>Gender:</strong> {koi.gender}</p>
+                                    <p><strong>Breed:</strong> {koi.breedName.join(', ')}</p>
+                                    <p><strong>Farm:</strong> {koi.farmName}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                {koiList.length === 0 && (
+                    <p className="text-red-500 text-3xl font-semibold text-center">No Koi Found</p>
+                )}
             </div>
         </div>
     );

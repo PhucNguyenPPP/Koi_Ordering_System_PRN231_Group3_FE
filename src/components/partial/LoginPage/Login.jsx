@@ -10,6 +10,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useAuth from '../../../hooks/useAuth';
+import { CircularProgress } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -31,11 +32,14 @@ const defaultTheme = createTheme();
 
 function Login() {
   const { login, isAuthenticated } = useAuth();
+  const [isLoading, setIsLoading] = React.useState(false);
   const handleSubmit = async (event) => {
+    setIsLoading(true);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    
+
     await login(data.get("email"), data.get("password"));
+    setIsLoading(false);
   };
 
   return (
@@ -66,7 +70,7 @@ function Login() {
               alignItems: 'center',
             }}
           >
-             <img className='w-40' src='image/logo.png'></img>
+            <img className='w-40' src='image/logo.png'></img>
             <Typography component="h1" variant="h5">
               SIGN IN
             </Typography>
@@ -99,10 +103,20 @@ function Login() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 3, mb: 2, position: 'relative' }} 
+                disabled={isLoading} 
               >
-                SIGN IN
+                {isLoading ? (
+                  <>
+                    <CircularProgress size={24} sx={{ position: 'absolute' }} />
+                    <span style={{ visibility: 'hidden' }}>SIGN IN</span>
+                  </>
+                ) : (
+                  'SIGN IN'
+                )}
               </Button>
+              Explanation of Changes:
+
               <Grid container>
                 <Grid item xs>
                   <Link href="/forgot-password" variant="body2">
@@ -110,11 +124,11 @@ function Login() {
                   </Link>
                 </Grid>
                 <Grid item className="text-right">
-                  <Link href="#" variant="body2">
+                  <Link href="/signup-customer" variant="body2">
                     {"Sign up as customer"}
                   </Link>
-                  <br/>
-                  <Link href="#" variant="body2">
+                  <br />
+                  <Link href="/signup-koi-farm" variant="body2">
                     {"Sign up as Koi farm"}
                   </Link>
                 </Grid>

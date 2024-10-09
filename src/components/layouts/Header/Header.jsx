@@ -164,7 +164,7 @@ function Header() {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static" sx={{ backgroundColor: '#C71125' }}>
+            <AppBar position="fixed" sx={{ backgroundColor: '#C71125', height: '70px' }}>
                 <Toolbar>
                     <Box
                         component="a"
@@ -187,26 +187,20 @@ function Header() {
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
 
-                    {(user?.roleName == "KoiFarm"
+                    {(user?.roleName == "KoiFarmManager"
                         || user?.roleName == "Customer"
                         || user?.roleName == "Admin")
                         ? (
                             <>
                                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                                    <IconButton size="large" aria-label="show 4 new mails" color="inherit" onClick={handleCartClick}>
-                                        <Badge>
-                                            <ShoppingCartOutlinedIcon style={{fontSize: '30px'}}/>
-                                        </Badge>
-                                    </IconButton>
-                                    <IconButton
-                                        size="large"
-                                        aria-label="show 17 new notifications"
-                                        color="inherit"
-                                    >
-                                        <Badge badgeContent={17} color="error">
-                                            <NotificationsIcon  style={{fontSize: '30px'}}/>
-                                        </Badge>
-                                    </IconButton>
+                                    {user?.roleName == "Customer" && (
+                                        <IconButton size="large" aria-label="show 4 new mails" color="inherit" onClick={handleCartClick}>
+                                            <Badge>
+                                                <ShoppingCartOutlinedIcon style={{ fontSize: '30px' }} />
+                                            </Badge>
+                                        </IconButton>
+                                    )}
+
                                     <IconButton
                                         size="large"
                                         edge="end"
@@ -216,7 +210,7 @@ function Header() {
                                         onClick={handleProfileMenuOpen}
                                         color="inherit"
                                     >
-                                        <AccountCircle style={{fontSize: '30px'}}/>
+                                        <AccountCircle style={{ fontSize: '30px' }} />
                                     </IconButton>
                                 </Box>
                                 <Box sx={{ display: { xs: 'flex', md: 'none' } }}>

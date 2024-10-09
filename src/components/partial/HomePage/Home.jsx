@@ -15,7 +15,7 @@ function Home() {
             const response = await GetAllKoi();
             const responseData = await response.json();
             if (response.ok) {
-                setKoiList(responseData.result);
+                setKoiList(responseData);
             } else if (response.status === 404) {
                 setKoiList([]);
             } else {
@@ -44,7 +44,7 @@ function Home() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 pt-10">
             <div className="pt-10 pb-10">
                 <div className="flex justify-center mb-10">
                     <div className="w-3/4">

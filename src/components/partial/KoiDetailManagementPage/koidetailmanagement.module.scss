@@ -2,16 +2,18 @@
     background-color: #F5F5F5; // Light gray background
     padding: 3rem 0;
     margin-top: 60px;
+    width: 100%;
 }
 
 .koiDetailContainer {
     display: flex;
     justify-content: space-between;
-    margin: 0 15%;
+    margin: 0 10%;
     padding: 2rem;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    width: 80%;
 }
 
 .koiDetailRight {

@@ -39,7 +39,7 @@ function KoiDetail() {
                 const response = await GetAllKoi();
                 const responseData = await response.json();
                 if (response.ok) {
-                    const filteredKoiList = responseData.result.filter(koi => koi.koiId !== koiId);
+                    const filteredKoiList = responseData.filter(koi => koi.koiId !== koiId);
                     setKoiList(filteredKoiList);
                 } else if (response.status === 404) {
                     setKoiList([]);
@@ -111,9 +111,20 @@ function KoiDetail() {
                 <div className={styles.koiDetailRight}>
                     <h2>{koiDetail.name}</h2>
                     <p><strong>Price:</strong> <span className='text-red-700 text-3xl font-semibold'>{formatPriceVND(koiDetail.price)}</span></p>
-                    <p><strong>Breed:</strong> {koiDetail.breedName}</p>
+                    <p><strong>Breed:</strong> {koiDetail.breedName.join(', ')}</p>
                     <p><strong>Gender:</strong> {koiDetail.gender}</p>
-                    <p><strong>Age:</strong> 2 years</p>
+                    <p><strong>Age:</strong> {koiDetail.age}</p>
+                    <p><strong>Certification: </strong>
+                        <a
+                            href={koiDetail.certificationLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline text-blue-500"
+                        >
+                            Certification Link
+                        </a>
+                    </p>
+
                     <p><strong>Description:</strong> {koiDetail.description}</p>
 
                     <div className={styles.buttonGroup}>

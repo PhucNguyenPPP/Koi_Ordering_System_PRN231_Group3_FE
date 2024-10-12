@@ -11,7 +11,6 @@ import KoiManagementPage from "../pages/KoiPage/KoiManagementPage";
 import HomeKoiFarmManagerPage from "../pages/HomePage/HomeKoiFarmManagerPage";
 import GuestAuth from "../guards/GuestAuth";
 import KoiDetailManagementPage from "../pages/KoiPage/KoiDetailManagementPage";
-import CheckOutPage from "../pages/CheckOutPage/CheckOutPage";
 
 export const router = createBrowserRouter([
   {
@@ -71,6 +70,11 @@ export const router = createBrowserRouter([
     path: "/check-out",
     element: <CheckOutPage />,
     errorElement: <Error />,
-  }
+  },
+  {
+    path: "/farms/:farmId",
+    element: <FarmDetailPage />,
+    errorElement: <Error />,
+  },
 ]);
 

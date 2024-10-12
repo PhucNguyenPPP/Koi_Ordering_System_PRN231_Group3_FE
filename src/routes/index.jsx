@@ -11,6 +11,7 @@ import KoiManagementPage from "../pages/KoiPage/KoiManagementPage";
 import HomeKoiFarmManagerPage from "../pages/HomePage/HomeKoiFarmManagerPage";
 import GuestAuth from "../guards/GuestAuth";
 import KoiDetailManagementPage from "../pages/KoiPage/KoiDetailManagementPage";
+import FarmDetailPage from "../pages/FarmPage/FarmDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -65,6 +66,11 @@ export const router = createBrowserRouter([
     path: "/koi-detail-management",
     element: <RoleBasedGuard accessibleRoles={['KoiFarmManager']} status="Active"><KoiDetailManagementPage /></RoleBasedGuard>,
     errorElement: <Error />,
-  }
+  },
+  {
+    path: "/farms/:farmId",
+    element: <FarmDetailPage />,
+    errorElement: <Error />,
+  },
 ]);
 

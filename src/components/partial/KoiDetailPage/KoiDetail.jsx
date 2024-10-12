@@ -148,7 +148,12 @@ function KoiDetail() {
                     <h3>{koiDetail.farmName}</h3>
                     <p className='text-red-700'>Rating: ★★★★☆ (4.5/5)</p>
                 </div>
-                <button className={styles.viewFarmButton}><StoreIcon /> View Farm</button>
+                <button
+                    className={styles.viewFarmButton}
+                    onClick={() => navigate(`/farms/${koiDetail.farmId}`)}  // Assuming you have a route for farm-detail
+                >
+                    <StoreIcon /> View Farm
+                </button>
             </div>
 
             <div className={styles.recommendedKoiContainer}>

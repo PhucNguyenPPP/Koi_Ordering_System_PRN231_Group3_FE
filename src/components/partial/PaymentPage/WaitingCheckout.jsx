@@ -25,7 +25,7 @@ function WaitingCheckout() {
             const isSuccess = vnp_ResponseCode === "00";
             const status = isSuccess ? "success" : "fail";
             const data = {
-                bookingNumber: vnp_TxnRef,
+                orderNumber: vnp_TxnRef,
                 transactionInfo: vnp_OrderInfo,
                 transactionNumber: vnp_TransactionNo,
                 isSuccess: isSuccess

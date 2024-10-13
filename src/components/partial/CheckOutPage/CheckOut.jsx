@@ -5,22 +5,23 @@ import { useForm, Controller } from "react-hook-form";
 import styles from './checkout.module.scss';
 import { GetStorageProvinceVietNam } from "../../../api/StorageProvinceApi";
 import { useEffect } from "react";
-import { GetKoiFarmDetail } from "../../../api/KoiFarmApi";
 import { GetShippingFeebyStorageProvinceIds } from "../../../api/ShippingFeeApi";
 import { toast } from "react-toastify";
+import useAuth from "../../../hooks/useAuth";
+import { CreateOrder } from "../../../api/OrderApi";
+import { CreatePaymentUrl } from "../../../api/PaymentApi";
 
 function CheckOut() {
     const [isLoading, setIsLoading] = useState(false);
     const [storageProvinceVietNam, setStorageProvinceVietNam] = useState([]);
-    const [selectedStorageProvinceVietnamId, setSelectedStorageProvinceVietnamId] = useState('');
+    const [shippingFee, setShippingFee] = useState(0);
     const location = useLocation();
     const { kois } = location.state || {};
-    const [shippingFee, setShippingFee] = useState(0);
+    const { user } = useAuth();
 
-    // Sử dụng react-hook-form
     const { control, handleSubmit, formState: { errors } } = useForm();
 
-    // Hàm format giá tiền VND
+
     const formatPriceVND = (price) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     };
@@ -35,15 +36,35 @@ function CheckOut() {
         return calculateTotalFishPrice() + shippingFee;
     };
 
-    // Hàm xử lý khi người dùng nhấn nút xác nhận
-    const onSubmit = (data) => {
-        console.log("Form Data:", data);
+    const onSubmit = async (data) => {
+        if (user) {
+            const response = await CreateOrder(data, user.userId, kois)
+            if (response.ok) {
+                const responseData = await response.json();
+                toast.success("Create order successfully");
+                setTimeout(() => {
+                }, 1000);
+
+                const fetchCreatePaymentUrl = async () => {
+                    const response = await CreatePaymentUrl(responseData.result);
+                    const responseDataCreateUrl = await response.json();
+                    if (response.ok) {
+                        setIsLoading(false);
+                        window.location.href = responseDataCreateUrl.result;
+                    } else {
+                        toast.error("Create payment link failed");
+                    }
+                };
+
+                fetchCreatePaymentUrl();
+            } else {
+                toast.error("Create order failed");
+            }
+        }
     };
 
     const handleChooseStorageProvinceVietnam = async (event) => {
         const selectedId = event.target.value;
-        setSelectedStorageProvinceVietnamId(selectedId);
-        setIsLoading(true);
         const response = await GetShippingFeebyStorageProvinceIds(kois[0].storageProvinceJapanId, selectedId);
         const responseData = await response.json();
         if (response.ok) {
@@ -53,12 +74,10 @@ function CheckOut() {
         } else {
             toast.error("Fetch shipping fee failed: " + responseData.message);
         }
-        setIsLoading(false);
     };
 
     useEffect(() => {
         const fetchProvinceStorageVietNam = async () => {
-            setIsLoading(true);
             const response = await GetStorageProvinceVietNam();
             const responseData = await response.json();
             if (response.ok) {
@@ -68,13 +87,12 @@ function CheckOut() {
             } else {
                 toast.error("Fetch province failed: " + responseData.message);
             }
-            setIsLoading(false);
         }
 
         fetchProvinceStorageVietNam();
     }, [kois])
 
-    if (isLoading || !kois) {
+    if (!kois || !user) {
         return (
             <div className="fixed inset-0 flex justify-center items-center bg-gray-200 z-50">
                 <CircularProgress />
@@ -112,6 +130,21 @@ function CheckOut() {
                     </Box>
                 </Paper>
             ))}
+
+            <Paper className={styles.section} elevation={3}>
+                <Box padding={2}>
+                    <Typography variant="body1" style={{ marginBottom: '10px', textAlign: 'right' }}>
+                        Merchandise Subtotal: <span style={{ fontWeight: 'bold', color: '#C71125' }}>{formatPriceVND(calculateTotalFishPrice())}</span>
+                    </Typography>
+                    <Typography variant="body1" style={{ marginBottom: '10px', textAlign: 'right' }}>
+                        Shipping Total: <span style={{ fontWeight: 'bold', color: '#C71125' }}>{formatPriceVND(shippingFee)}</span>
+                    </Typography>
+                    <Typography variant="h6" style={{ fontWeight: 'bold', color: '#C71125', textAlign: 'right' }}>
+                        Total Payment: <span>{formatPriceVND(calculateTotalOrderPrice())}</span>
+                    </Typography>
+                </Box>
+            </Paper>
+
 
             <Paper className={styles.section} elevation={3}>
                 <Box padding={2}>
@@ -166,16 +199,20 @@ function CheckOut() {
                                     name="province"
                                     control={control}
                                     rules={{
-                                        required: 'Please select a farm province',
+                                        required: 'Please select a province',
                                     }}
                                     render={({ field }) => (
-                                        <FormControl fullWidth error={!!errors.farmType} margin="normal" variant="outlined">
-                                            <InputLabel id="farm-province-label">Farm Province</InputLabel>
+                                        <FormControl fullWidth error={!!errors.province} margin="normal" variant="outlined">
+                                            <InputLabel id="province">Province</InputLabel>
                                             <Select
-                                                value={field || ''}
-                                                labelId="farm-province-label"
-                                                label="Farm Province"
-                                                onChange={handleChooseStorageProvinceVietnam}
+                                                {...field}
+                                                labelId="province"
+                                                label="Province"
+                                                onChange={(e) => {
+                                                    field.onChange(e.target.value);
+                                                    handleChooseStorageProvinceVietnam(e);
+                                                }}
+                                                value={field.value}
                                             >
                                                 {storageProvinceVietNam.map((i) => (
                                                     <MenuItem key={i.storageProvinceId} value={i.storageProvinceId}>{i.provinceName} </MenuItem>
@@ -192,30 +229,23 @@ function CheckOut() {
 
                         <Button
                             variant="contained"
-                            color="primary"
+
                             type="submit"
                             fullWidth
+                            style={{ backgroundColor: "#C71125"}}
                         >
-                            CHECK OUT
+                            {isLoading ? (
+                                <>
+                                    <CircularProgress size={24} sx={{ position: 'absolute' }} />
+                                    <span style={{ visibility: 'hidden' }}>CHECK OUT</span>
+                                </>
+                            ) : (
+                                'CHECK OUT'
+                            )}
                         </Button>
                     </form>
                 </Box>
             </Paper>
-
-            <Paper className={styles.section} elevation={3}>
-                <Box padding={2}>
-                    <Typography variant="body1" style={{ marginBottom: '10px', textAlign: 'right' }}>
-                        Merchandise Subtotal: <span style={{ fontWeight: 'bold', color: '#C71125' }}>{formatPriceVND(calculateTotalFishPrice())}</span>
-                    </Typography>
-                    <Typography variant="body1" style={{ marginBottom: '10px', textAlign: 'right' }}>
-                        Shipping Total: <span style={{ fontWeight: 'bold', color: '#C71125' }}>{formatPriceVND(shippingFee)}</span>
-                    </Typography>
-                    <Typography variant="h6" style={{ fontWeight: 'bold', color: '#C71125', textAlign: 'right' }}>
-                        Total Payment: <span>{formatPriceVND(calculateTotalOrderPrice())}</span>
-                    </Typography>
-                </Box>
-            </Paper>
-
         </div>
     );
 }

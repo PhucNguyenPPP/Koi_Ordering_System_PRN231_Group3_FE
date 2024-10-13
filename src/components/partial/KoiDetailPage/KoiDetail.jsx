@@ -67,7 +67,6 @@ function KoiDetail() {
         }
 
         const fetchAddToCart = async () => {
-            setIsLoading(true);
             const data = {
                 userId: user.userId,
                 koiId: koiDetail.koiId
@@ -79,7 +78,6 @@ function KoiDetail() {
             } else {
                 toast.error(responseData.message);
             }
-            setIsLoading(false);
         };
 
         fetchAddToCart();

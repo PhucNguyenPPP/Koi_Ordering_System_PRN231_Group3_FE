@@ -4,12 +4,15 @@ import styles from './Cart.module.scss';
 import useAuth from '../../../hooks/useAuth';
 import { DeleteCartUser, GetCartUser } from '../../../api/CartApi';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
     const [cartList, setCartList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [checkedItems, setCheckedItems] = useState([]);
+    const [checkedItems, setCheckedItems] = useState([]); // Store checked IDs
+    const [selectedKois, setSelectedKois] = useState([]); // Store selected Koi objects
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const fetchCartUser = async () => {
         setIsLoading(true);
@@ -43,6 +46,13 @@ const CartPage = () => {
                 return [...prevCheckedItems, cartId]; // Check
             }
         });
+
+        const selectedKoi = cartList.find((cart) => cart.cartId === cartId);
+        if (selectedKois.some(koi => koi.cartId === cartId)) {
+            setSelectedKois((prevSelectedKois) => prevSelectedKois.filter(koi => koi.cartId !== cartId));
+        } else {
+            setSelectedKois((prevSelectedKois) => [...prevSelectedKois, selectedKoi]);
+        }
     };
 
     const calculateTotalPrice = () => {
@@ -56,7 +66,7 @@ const CartPage = () => {
             setIsLoading(true);
             const response = await DeleteCartUser(cartId);
             const responseData = await response.json();
-            
+
             if (response.ok) {
                 toast.success("Delete from cart successfully");
                 setCheckedItems((prevCheckedItems) => prevCheckedItems.filter((id) => id !== cartId));
@@ -68,7 +78,23 @@ const CartPage = () => {
         };
 
         fetchDeleteCartUser();
-    }
+    };
+
+    const handleCheckOut = () => {
+        if (selectedKois.length > 0) {
+            const farmIds = selectedKois.map(koi => koi.farmId);
+            const isSameFarm = farmIds.every(farmId => farmId === farmIds[0]);
+
+            if (!isSameFarm) {
+                toast.error('Please select koi from the same farm to check out.');
+                return;
+            }
+
+            navigate('/check-out', { state: { kois: selectedKois } });
+        } else {
+            toast.error('Please select at least one koi to check out.');
+        }
+    };
 
     if (isLoading) {
         return (
@@ -97,8 +123,10 @@ const CartPage = () => {
                         onChange={(e) => {
                             if (e.target.checked) {
                                 setCheckedItems(cartList.map((cart) => cart.cartId));
+                                setSelectedKois(cartList);
                             } else {
                                 setCheckedItems([]);
+                                setSelectedKois([]);
                             }
                         }}
                     />
@@ -149,7 +177,7 @@ const CartPage = () => {
                         padding: '10px 50px',
                         borderRadius: '5px',
                         color: 'white'
-                    }} color="primary">Check Out</button>
+                    }} onClick={handleCheckOut}>Check Out</button>
                 </div>
             </Paper>
         </div>

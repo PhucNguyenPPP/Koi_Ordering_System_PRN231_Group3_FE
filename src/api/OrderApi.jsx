@@ -39,3 +39,20 @@ export const GetAllCustomerHistoryOrder = async (customerId) => {
         console.log(err);
     }
 };
+
+export const GetOrderDetail = async (orderId) => {
+    try {
+        const url = `${baseUrl}/odata/order-detail?orderId=${orderId}`;
+        const request = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};

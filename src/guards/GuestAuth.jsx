@@ -8,6 +8,8 @@ export default function GuestAuth({ children }) {
             return <Navigate to="/" />;
         } else if (user && (user?.roleName == "KoiFarmManager")) {
             return <Navigate to="/home-koi-farm-manager" />;
+        } else if (user && (user?.roleName == "StorageManager")) {
+            return <Navigate to="/home-storage-manager" />;
         }
         return <Navigate to="/" />;
     }

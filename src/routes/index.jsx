@@ -14,8 +14,13 @@ import KoiDetailManagementPage from "../pages/KoiPage/KoiDetailManagementPage";
 import CheckOutPage from "../pages/CheckOutPage/CheckOutPage";
 import FarmDetailPage from "../pages/FarmPage/FarmDetailPage";
 import WaitingCheckoutPage from "../pages/PaymentPage/WaitingCheckoutPage";
-import OrderListCustomerPage from "../pages/OrderPageCustomer/OrderListCustomerPage";
-import OrderDetailCustomerPage from "../pages/OrderPageCustomer/OrderDetailCustomer";
+import OrderListCustomerPage from "../pages/OrderCustomerPage/OrderListCustomerPage";
+import OrderDetailCustomerPage from "../pages/OrderCustomerPage/OrderDetailCustomerPage";
+import OrderListFarmPage from "../pages/OrderFarmPage/OrderListFarmPage";
+import OrderDetailFarmPage from "../pages/OrderFarmPage/OrderDetailFarmPage";
+import HomeStorageManagerPage from "../pages/HomePage/HomeStorageManagerPage";
+import OrderListStorageManagerPage from "../pages/OrderStorageManagerPage/OrderListStorageManagerPage";
+import OrderDetailStorageManagerPage from "../pages/OrderStorageManagerPage/OrderDetailStorageManagerPage";
 
 export const router = createBrowserRouter([
   {
@@ -92,7 +97,26 @@ export const router = createBrowserRouter([
   { path: "/order-detail", 
     element: <RoleBasedGuard accessibleRoles={['Customer']} status="Active" ><OrderDetailCustomerPage /></RoleBasedGuard>,
     errorElement: <Error/> 
+  },
+  { path: "/order-list-farm", 
+    element: <RoleBasedGuard accessibleRoles={['KoiFarmManager']} status="Active" ><OrderListFarmPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-detail-farm", 
+    element: <RoleBasedGuard accessibleRoles={['KoiFarmManager']} status="Active" ><OrderDetailFarmPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/home-storage-manager", 
+    element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><HomeStorageManagerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-list-storage", 
+    element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><OrderListStorageManagerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-detail-storage", 
+    element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><OrderDetailStorageManagerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
   }
-
 ]);
 

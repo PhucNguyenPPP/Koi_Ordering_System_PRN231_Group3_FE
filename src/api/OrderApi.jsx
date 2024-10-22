@@ -25,7 +25,27 @@ export const CreateOrder = async (data, customerId, kois) => {
 
 export const GetAllCustomerHistoryOrder = async (customerId) => {
     try {
-        const url = `${baseUrl}/odata/all-customer-history-order?customerId=${customerId}`;
+        const url = `${baseUrl}/odata/all-customer-history-order?customerId=${customerId}&$orderby=createdDate desc`;
+        const request = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+export const GetAllFarmHistoryOrder = async (farmId, searchQuery) => {
+    try {
+        var url = `${baseUrl}/odata/all-farm-history-order?farmId=${farmId}&$orderby=createdDate desc`;
+        if(searchQuery != ''){
+            url += `&$filter=contains(customerName,'${searchQuery}')`
+        }
         const request = {
             method: "GET",
             headers: {

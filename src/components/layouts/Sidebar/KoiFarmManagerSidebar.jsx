@@ -8,6 +8,7 @@ export default function KoiFarmManagerSideBar() {
         <Sidebar>
             <SidebarItem icon={<HomeOutlinedIcon/>} text={"Home"} href={"/home-koi-farm-manager"}/>
             <SidebarItem icon={<SetMealIcon /> } text={"Koi Management"} href={"/koi-management"}/>
+            <SidebarItem icon={<SetMealIcon /> } text={"Order Management"} href={"/order-list-farm"}/>
         </Sidebar>
     );
 }

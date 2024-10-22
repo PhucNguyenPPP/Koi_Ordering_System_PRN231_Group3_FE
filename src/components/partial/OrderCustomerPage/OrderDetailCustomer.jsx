@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { GetOrderDetail } from '../../../api/OrderApi';
 import styles from './order-detail.module.scss';
+import dayjs from 'dayjs';
 
 function OrderDetailCustomer() {
     const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +16,10 @@ function OrderDetailCustomer() {
 
     const formatPriceVND = (price) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    };
+
+    const formatDate = (dateString) => {
+        return dayjs(dateString).format('DD-MM-YYYY HH:mm');
     };
 
     const fetchGetOrderDetail = async () => {
@@ -81,7 +86,7 @@ function OrderDetailCustomer() {
                         </div>
                         <div className={styles.footerItem}>
                             <span className={styles.label}>Created Date:</span>
-                            <span className={styles.value}>{new Date(orderDetail.createdDate).toLocaleDateString()}</span>
+                            <span className={styles.value}>{formatDate(orderDetail.createdDate)}</span>
                         </div>
                         <div className={styles.footerItem}>
                             <span className={styles.label}>Phone:</span>

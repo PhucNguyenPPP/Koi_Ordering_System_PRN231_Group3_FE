@@ -16,6 +16,7 @@ import FarmDetailPage from "../pages/FarmPage/FarmDetailPage";
 import WaitingCheckoutPage from "../pages/PaymentPage/WaitingCheckoutPage";
 import OrderListCustomerPage from "../pages/OrderCustomerPage/OrderListCustomerPage";
 import OrderDetailCustomerPage from "../pages/OrderCustomerPage/OrderDetailCustomerPage";
+import OrderListFarmPage from "../pages/OrderFarmPage/OrderListFarmPage";
 
 export const router = createBrowserRouter([
   {
@@ -91,6 +92,10 @@ export const router = createBrowserRouter([
   },
   { path: "/order-detail", 
     element: <RoleBasedGuard accessibleRoles={['Customer']} status="Active" ><OrderDetailCustomerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-list-farm", 
+    element: <RoleBasedGuard accessibleRoles={['KoiFarmManager']} status="Active" ><OrderListFarmPage /></RoleBasedGuard>,
     errorElement: <Error/> 
   }
 

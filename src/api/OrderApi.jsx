@@ -76,3 +76,21 @@ export const GetOrderDetail = async (orderId) => {
         console.log(err);
     }
 };
+
+export const PackOrder = async (data, orderId) => {
+    try {
+        const url = `${baseUrl}/odata/packaging/${orderId}`;
+        const request = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};

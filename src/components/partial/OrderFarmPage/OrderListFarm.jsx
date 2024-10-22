@@ -9,19 +9,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import useAuth from '../../../hooks/useAuth';
-import { CreateKoi, DeleteKoi, GetAllKoiOfFarm, UpdateKoi } from '../../../api/KoiApi';
-import { CircularProgress, Button, TextField, debounce, Modal, RadioGroup, FormControlLabel, Radio, Checkbox, FormControl, InputLabel, Input, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { CircularProgress, TextField, debounce} from '@mui/material';
 import { MoreHorizontalIcon } from 'lucide-react';
-import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
-import { toast } from 'react-toastify';
-import SearchIcon from '@mui/icons-material/Search';
-import { useForm, Controller, set } from 'react-hook-form';
-import { GetAllBreed } from '../../../api/BreedApi';
 import { useNavigate } from 'react-router-dom';
 import { GetAllFarmHistoryOrder } from '../../../api/OrderApi';
 import dayjs from 'dayjs';
@@ -80,9 +73,9 @@ const OrderListFarm = () => {
         return dayjs(dateString).format('DD-MM-YYYY HH:mm');
     };
 
-    const handleMenuClick = (event, koi) => {
+    const handleMenuClick = (event, order) => {
         setAnchorEl(event.currentTarget);
-        setSelectedKoi(koi);
+        setSelectedOrder(order);
     };
 
     const handleMenuClose = () => {
@@ -95,7 +88,7 @@ const OrderListFarm = () => {
 
     const handleDetail = () => {
         const orderId = selectedOrder.orderId
-        navigate('/koi-detail-management', { state: { orderId } });
+        navigate('/order-detail-farm', { state: { orderId } });
         handleMenuClose();
     };
 

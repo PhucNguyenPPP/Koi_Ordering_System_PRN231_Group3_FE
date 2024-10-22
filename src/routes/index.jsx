@@ -14,6 +14,8 @@ import KoiDetailManagementPage from "../pages/KoiPage/KoiDetailManagementPage";
 import CheckOutPage from "../pages/CheckOutPage/CheckOutPage";
 import FarmDetailPage from "../pages/FarmPage/FarmDetailPage";
 import WaitingCheckoutPage from "../pages/PaymentPage/WaitingCheckoutPage";
+import OrderListCustomerPage from "../pages/OrderPageCustomer/OrderListCustomerPage";
+import OrderDetailCustomerPage from "../pages/OrderPageCustomer/OrderDetailCustomer";
 
 export const router = createBrowserRouter([
   {
@@ -71,7 +73,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/check-out",
-    element: <CheckOutPage />,
+    element: <RoleBasedGuard accessibleRoles={['Customer']} status="Active" ><CheckOutPage /></RoleBasedGuard>,
     errorElement: <Error />,
   },
   {
@@ -80,8 +82,17 @@ export const router = createBrowserRouter([
     errorElement: <Error />,
   },
   { path: "/waiting-checkout", 
-    element: <WaitingCheckoutPage />,
+    element: <RoleBasedGuard accessibleRoles={['Customer']} status="Active" ><WaitingCheckoutPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-history", 
+    element: <RoleBasedGuard accessibleRoles={['Customer']} status="Active" ><OrderListCustomerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-detail", 
+    element: <RoleBasedGuard accessibleRoles={['Customer']} status="Active" ><OrderDetailCustomerPage /></RoleBasedGuard>,
     errorElement: <Error/> 
   }
+
 ]);
 

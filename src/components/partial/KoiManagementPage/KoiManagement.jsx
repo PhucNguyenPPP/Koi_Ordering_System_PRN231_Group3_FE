@@ -306,8 +306,12 @@ const KoiManagement = () => {
                 onClose={handleMenuClose}
             >
                 <MenuItem style={{ color: 'blue' }} onClick={handleDetail}><InfoIcon className='mr-1' /> Detail</MenuItem>
-                <MenuItem style={{ color: 'orange' }} onClick={handleEdit}><EditIcon className='mr-1' /> Edit</MenuItem>
-                <MenuItem style={{ color: 'red' }} onClick={handleDelete}><DeleteIcon className='mr-1' /> Delete</MenuItem>
+                {selectedKoi && selectedKoi.status && (
+                    <>
+                        <MenuItem style={{ color: 'orange' }} onClick={handleEdit}><EditIcon className='mr-1' /> Edit</MenuItem>
+                        <MenuItem style={{ color: 'red' }} onClick={handleDelete}><DeleteIcon className='mr-1' /> Delete</MenuItem>
+                    </>
+                )}
             </Menu>
 
             {/* Modal for Creating New Koi */}

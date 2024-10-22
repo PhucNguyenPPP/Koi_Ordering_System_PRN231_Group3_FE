@@ -1,18 +1,11 @@
-import Footer from "../../components/layouts/Footer/Footer";
-import Header from "../../components/layouts/Header/Header";
-import KoiFarmManagerSideBar from "../../components/layouts/Sidebar/KoiFarmManagerSidebar";
+import LayoutKoiManager from "../../components/layouts/LayoutKoiManager";
 import KoiDetailManagement from "../../components/partial/KoiDetailManagementPage/KoiDetailManagement";
 
 const KoiDetailManagementPage = () => {
     return (
-        <>
-            <Header />
-            <div className="flex">
-                <KoiFarmManagerSideBar />
-                <KoiDetailManagement />
-            </div>
-            <Footer />
-        </>
+        <LayoutKoiManager>
+            <KoiDetailManagement />
+        </LayoutKoiManager>
     );
 };
 

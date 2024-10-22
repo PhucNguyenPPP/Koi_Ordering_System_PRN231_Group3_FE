@@ -17,6 +17,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import useAuth from '../../../hooks/useAuth';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { useNavigate } from 'react-router-dom';
+import { Logout } from '../../../api/AuthenApi';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -61,7 +62,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function Header() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     const isMenuOpen = Boolean(anchorEl);
@@ -88,6 +89,21 @@ function Header() {
         navigate('/cart');
     };
 
+    const handleClickLogout = async () => {
+        const refreshToken = localStorage.getItem("refreshToken");
+        const response = await Logout(refreshToken);
+        if (response.ok) {
+            setAnchorEl(null);
+            handleMobileMenuClose();
+            await logout();
+            navigate("/");
+        }
+    };
+
+    const handleClickOrderHistory = () => {
+        navigate("/order-history");
+    }
+
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
         <Menu
@@ -105,8 +121,10 @@ function Header() {
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            {user && user?.roleName == "Customer" && (
+                <MenuItem onClick={handleClickOrderHistory}>My Purchase</MenuItem>
+            )}
+            <MenuItem onClick={handleClickLogout}>Sign Out</MenuItem>
         </Menu>
     );
 
@@ -181,7 +199,7 @@ function Header() {
                             <SearchIcon />
                         </SearchIconWrapper>
                         <StyledInputBase
-                            placeholder="Tìm kiếm..."
+                            placeholder="Search koi name..."
                             inputProps={{ 'aria-label': 'search' }}
                         />
                     </Search>
@@ -229,8 +247,8 @@ function Header() {
 
                         ) : (
                             <Box className="text-white">
-                                <a href='/login' className='mr-8 underline'>Đăng nhập</a>
-                                <a href='/role-signup' className='underline'>Đăng kí</a>
+                                <a href='/login' className='mr-8 underline'>Sign In</a>
+                                <a href='/role-signup' className='underline'>Sign Up</a>
                             </Box>
                         )}
                 </Toolbar>

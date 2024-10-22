@@ -28,20 +28,6 @@ function KoiDetailManagement() {
 
             fetchKoiDetail();
 
-            const fetchAllKoiList = async () => {
-                const response = await GetAllKoi();
-                const responseData = await response.json();
-                if (response.ok) {
-                    const filteredKoiList = responseData.filter(koi => koi.koiId !== koiId);
-                    setKoiList(filteredKoiList);
-                } else if (response.status === 404) {
-                    setKoiList([]);
-                } else {
-                    toast.error("Fetch koi failed: " + responseData.message);
-                }
-            };
-
-            fetchAllKoiList();
             setIsLoading(false);
         }
     }, [koiId])

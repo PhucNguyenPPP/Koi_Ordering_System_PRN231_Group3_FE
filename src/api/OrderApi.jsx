@@ -11,12 +11,29 @@ export const CreateOrder = async (data, customerId, kois) => {
             formData.append('CartId', koi.cartId);
         });
 
-        const url = `${baseUrl}/api/Order/koi`;
+        const url = `${baseUrl}/odata/order`;
         const request = {
             method: "POST",
             body: formData
         };
         const response = await fetch(url, request);
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+export const GetAllCustomerHistoryOrder = async (customerId) => {
+    try {
+        const url = `${baseUrl}/odata/all-customer-history-order?customerId=${customerId}`;
+        const request = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        const response = await fetch(url, request);
+        
         return response;
     } catch (err) {
         console.log(err);

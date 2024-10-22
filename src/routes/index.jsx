@@ -18,6 +18,9 @@ import OrderListCustomerPage from "../pages/OrderCustomerPage/OrderListCustomerP
 import OrderDetailCustomerPage from "../pages/OrderCustomerPage/OrderDetailCustomerPage";
 import OrderListFarmPage from "../pages/OrderFarmPage/OrderListFarmPage";
 import OrderDetailFarmPage from "../pages/OrderFarmPage/OrderDetailFarmPage";
+import HomeStorageManagerPage from "../pages/HomePage/HomeStorageManagerPage";
+import OrderListStorageManagerPage from "../pages/OrderStorageManagerPage/OrderListStorageManagerPage";
+import OrderDetailStorageManagerPage from "../pages/OrderStorageManagerPage/OrderDetailStorageManagerPage";
 
 export const router = createBrowserRouter([
   {
@@ -102,7 +105,18 @@ export const router = createBrowserRouter([
   { path: "/order-detail-farm", 
     element: <RoleBasedGuard accessibleRoles={['KoiFarmManager']} status="Active" ><OrderDetailFarmPage /></RoleBasedGuard>,
     errorElement: <Error/> 
+  },
+  { path: "/home-storage-manager", 
+    element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><HomeStorageManagerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-list-storage", 
+    element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><OrderListStorageManagerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/order-detail-storage", 
+    element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><OrderDetailStorageManagerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
   }
-
 ]);
 

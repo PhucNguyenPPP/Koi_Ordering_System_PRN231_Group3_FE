@@ -60,6 +60,26 @@ export const GetAllFarmHistoryOrder = async (farmId, searchQuery) => {
     }
 };
 
+export const GetAllOrderOfStorage = async (storageProvinceId, searchQuery) => {
+    try {
+        var url = `${baseUrl}/odata/all-storage-history-order?storageProvinceId=${storageProvinceId}&$orderby=createdDate desc`;
+        if(searchQuery != ''){
+            url += `&$filter=contains(customerName,'${searchQuery}')`
+        }
+        const request = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 export const GetOrderDetail = async (orderId) => {
     try {
         const url = `${baseUrl}/odata/order-detail?orderId=${orderId}`;

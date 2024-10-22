@@ -5,10 +5,10 @@ import useAuth from '../../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { useLocation } from 'react-router-dom';
 import { GetOrderDetail, PackOrder } from '../../../api/OrderApi';
-import styles from './order-detail-farm.module.scss';
+import styles from './order-detail-storage-manager.module.scss';
 import dayjs from 'dayjs';
 
-function OrderDetailFarm() {
+function OrderDetailStorageManager() {
     const [isLoading, setIsLoading] = useState(false);
     const [orderDetail, setOrderDetail] = useState(null);
     const [openDialog, setOpenDialog] = useState(false); // State để mở Dialog
@@ -44,25 +44,6 @@ function OrderDetailFarm() {
         }
     }, [orderId]);
 
-    const handlePackOrder = async (data) => {
-        setIsLoading(true);
-        const dataJson = {
-            length: data.length,
-            width: data.width,
-            height: data.height,
-            weight: data.weight
-        }
-        const response = await PackOrder(dataJson, orderId)
-        if (response.ok) {
-            toast.success('Pack order successfully');
-            fetchGetOrderDetail();
-        } else {
-            toast.error('Pack order failed');
-        }
-        setOpenDialog(false);
-        reset();
-        setIsLoading(false);
-    };
 
     if (isLoading || !orderId) {
         return (
@@ -121,6 +102,20 @@ function OrderDetailFarm() {
                             <span className={styles.label}>Customer Province:</span>
                             <span className={styles.value}>{orderDetail.customerProvince}</span>
                         </div>
+                        <div className={styles.footerItem}>
+                            <span className={styles.label}>Koi Farm:</span>
+                            <span className={styles.value}>{orderDetail.farmName}</span>
+                        </div>
+                        <div className={styles.footerItem}>
+                            <span className={styles.label}>Koi Farm Phone:</span>
+                            <span className={styles.value}>{orderDetail.farmPhone}</span>
+                        </div>
+                        <div className={styles.footerItem}>
+                            <span className={styles.label}>Koi Farm Address:</span>
+                            <span className={styles.value}>{orderDetail.farmAddress}</span>
+                        </div>
+
+                        
 
                         {orderDetail.length && (
                             <>
@@ -151,13 +146,13 @@ function OrderDetailFarm() {
                             <span className={styles.label}>Order Total:</span>
                             <span style={{ color: '#C71125', fontWeight: 'bold', fontSize: '18px' }}>{formatPriceVND(orderDetail.totalPrice)}</span>
                         </div>
-                        {orderDetail.status == "Processing" && (
+                        {orderDetail.status == "To Ship" && (
                             <div>
                                 <Button
                                     style={{ backgroundColor: '#C71125', color: 'white', marginTop: '10px' }}
                                     onClick={() => setOpenDialog(true)}
                                 >
-                                    Pack Order
+                                    Assign Shipper
                                 </Button>
                             </div>
                         )}
@@ -166,121 +161,8 @@ function OrderDetailFarm() {
                 </div>
             )}
 
-            {/* Dialog để nhập kích thước */}
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                <DialogTitle>Pack Order</DialogTitle>
-                <DialogContent style={{ paddingTop: '10px' }}>
-                    <form onSubmit={handleSubmit(handlePackOrder)}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', gap: '10px' }}>
-                            <Controller
-                                name="length"
-                                control={control}
-                                defaultValue=""
-                                rules={{
-                                    required: 'Please input length',
-                                    min: {
-                                        value: 1,
-                                        message: 'Length must be at least 1'
-                                    }
-                                }}
-
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Length (cm)"
-                                        type="number"
-                                        variant="outlined"
-                                        fullWidth
-                                        error={!!errors.length}
-                                        helperText={errors.length?.message}
-                                    />
-                                )}
-                            />
-                            <Controller
-                                name="width"
-                                control={control}
-                                defaultValue=""
-                                rules={{
-                                    required: 'Please input width',
-                                    min: {
-                                        value: 1,
-                                        message: 'Width must be at least 1'
-                                    }
-                                }}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Width (cm)"
-                                        type="number"
-                                        variant="outlined"
-                                        fullWidth
-                                        error={!!errors.width}
-                                        helperText={errors.width?.message}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
-                            <Controller
-                                name="height"
-                                control={control}
-                                defaultValue=""
-                                rules={{
-                                    required: 'Please input height',
-                                    min: {
-                                        value: 1,
-                                        message: 'Height must be at least 1'
-                                    }
-                                }}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Height (cm)"
-                                        type="number"
-                                        variant="outlined"
-                                        fullWidth
-                                        error={!!errors.height}
-                                        helperText={errors.height?.message}
-                                    />
-                                )}
-                            />
-                            <Controller
-                                name="weight"
-                                control={control}
-                                defaultValue=""
-                                rules={{
-                                    required: 'Please input weight',
-                                    min: {
-                                        value: 1,
-                                        message: 'Weight must be at least 1'
-                                    }
-                                }}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Weight (kg)"
-                                        type="number"
-                                        variant="outlined"
-                                        fullWidth
-                                        error={!!errors.weight}
-                                        helperText={errors.weight?.message}
-                                    />
-                                )}
-                            />
-                        </div>
-                    </form>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)} color="primary">
-                        Cancel
-                    </Button>
-                    <Button type="submit" style={{ backgroundColor: '#C71125', color: 'white' }} onClick={handleSubmit(handlePackOrder)}>
-                        Submit
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 }
 
-export default OrderDetailFarm;
+export default OrderDetailStorageManager;

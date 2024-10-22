@@ -81,7 +81,7 @@ function OrderDetailCustomer() {
                     {/* Footer của item */}
                     <div className={styles.footer}>
                     <div className={styles.footerItem}>
-                            <span className={styles.label}>OrderId:</span>
+                            <span className={styles.label}>Order ID:</span>
                             <span className={styles.value}>{orderDetail.orderNumber}</span>
                         </div>
                         <div className={styles.footerItem}>
@@ -95,6 +95,10 @@ function OrderDetailCustomer() {
                         <div className={styles.footerItem}>
                             <span className={styles.label}>Address:</span>
                             <span className={styles.value}>{orderDetail.address}</span>
+                        </div>
+                        <div className={styles.footerItem}>
+                            <span className={styles.label}>Province:</span>
+                            <span className={styles.value}>{orderDetail.customerProvince}</span>
                         </div>
                         <div className={styles.footerItem}>
                             <span className={styles.label}>Shipping Fee:</span>

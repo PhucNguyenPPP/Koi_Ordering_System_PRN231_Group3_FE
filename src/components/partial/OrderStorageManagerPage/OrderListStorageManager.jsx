@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from './order-list-farm.module.scss';
+import styles from './order-list-storage-manager.module.scss';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,8 +16,8 @@ import { CircularProgress, TextField, debounce} from '@mui/material';
 import { MoreHorizontalIcon } from 'lucide-react';
 import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate } from 'react-router-dom';
-import { GetAllFarmHistoryOrder } from '../../../api/OrderApi';
 import dayjs from 'dayjs';
+import { GetAllOrderOfStorage } from '../../../api/OrderApi';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -35,7 +35,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const OrderListFarm = () => {
+const OrderListStorageManager = () => {
     const [orderList, setOrderList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { user } = useAuth();
@@ -44,15 +44,15 @@ const OrderListFarm = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
-    const fetchAllOrderOfFarm = async () => {
-        const response = await GetAllFarmHistoryOrder(user.farmId, searchQuery);
+    const fetchAllOrderOfStorage = async () => {
+        const response = await GetAllOrderOfStorage(user.storageProvinceId, searchQuery);
         const responseData = await response.json();
         if (response.ok) {
             setOrderList(responseData);
         } else if (response.status === 404) {
             setOrderList([]);
         } else {
-            console.log("Error when fetch get all farm history order")
+            console.log("Error when fetch get all  order of storage")
         }
     };
 
@@ -60,7 +60,7 @@ const OrderListFarm = () => {
     useEffect(() => {
         if (user) {
             setIsLoading(true);
-            fetchAllOrderOfFarm();
+            fetchAllOrderOfStorage();
             setIsLoading(false);
         }
     }, [user, searchQuery]);
@@ -88,7 +88,7 @@ const OrderListFarm = () => {
 
     const handleDetail = () => {
         const orderId = selectedOrder.orderId
-        navigate('/order-detail-farm', { state: { orderId } });
+        navigate('/order-detail-storage', { state: { orderId } });
         handleMenuClose();
     };
 
@@ -118,6 +118,7 @@ const OrderListFarm = () => {
                             <TableRow>
                                 <StyledTableCell style={{ fontWeight: 'bold', fontSize: '20px' }}>Order ID</StyledTableCell>
                                 <StyledTableCell style={{ fontWeight: 'bold', fontSize: '20px' }}>Customer</StyledTableCell>
+                                <StyledTableCell style={{ fontWeight: 'bold', fontSize: '20px' }}>Farm</StyledTableCell>
                                 <StyledTableCell style={{ fontWeight: 'bold', fontSize: '20px' }}>Created Date</StyledTableCell>
                                 <StyledTableCell style={{ fontWeight: 'bold', fontSize: '20px' }}>Total Price</StyledTableCell>
                                 <StyledTableCell style={{ fontWeight: 'bold', fontSize: '20px' }} align="center">Status</StyledTableCell>
@@ -131,6 +132,7 @@ const OrderListFarm = () => {
                                         <p className='font-semibold'>{order.orderNumber}</p>
                                     </StyledTableCell>
                                     <StyledTableCell>{order.customerName}</StyledTableCell>
+                                    <StyledTableCell>{order.farmName}</StyledTableCell>
                                     <StyledTableCell>{formatDate(order.createdDate)}</StyledTableCell>
                                     <StyledTableCell style={{ fontWeight: 'bold'}}>{formatPriceVND(order.totalPrice)}</StyledTableCell>
                                     <StyledTableCell align="center">{order.status}</StyledTableCell>
@@ -162,4 +164,4 @@ const OrderListFarm = () => {
     );
 };
 
-export default OrderListFarm;
+export default OrderListStorageManager;

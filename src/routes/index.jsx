@@ -14,7 +14,7 @@ import KoiDetailManagementPage from "../pages/KoiPage/KoiDetailManagementPage";
 import CheckOutPage from "../pages/CheckOutPage/CheckOutPage";
 import FarmDetailPage from "../pages/FarmPage/FarmDetailPage";
 import WaitingCheckoutPage from "../pages/PaymentPage/WaitingCheckoutPage";
-import OrderListCustomerPage from "../pages/OrderPageCustomer/OrderListCustomerPage";
+import OrderListCustomerPage from "../pages/OrderCustomerPage/OrderListCustomerPage";
 import OrderDetailCustomerPage from "../pages/OrderCustomerPage/OrderDetailCustomerPage";
 
 export const router = createBrowserRouter([

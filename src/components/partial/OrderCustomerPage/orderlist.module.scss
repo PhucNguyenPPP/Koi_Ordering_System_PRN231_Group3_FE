@@ -1,0 +1,108 @@
+.backgroundContainer {
+    background-color: #F5F5F5;
+    padding: 3rem 0;
+}
+
+.sectionItemContainer { 
+    display: flex;
+    flex-direction: column;
+    margin: 0 15%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    height: max-content;
+}
+
+.itemHeader {
+    border-radius: 10px 10px 0 0;
+    padding: 20px 50px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    background-color: #C71125;
+    color: white;
+}
+
+.shopName {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.orderStatus {
+    color: black;
+    font-size: 1rem;
+    padding: 5px 10px;
+    background-color: orange;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.itemBody {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.fishList {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid grey;
+}
+
+.fishImage {
+    width: 150px;
+    height: 200px;
+    object-fit: cover;
+    margin-right: 1rem;
+}
+
+.fishDetails {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.fishName {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.fishPrice {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.itemFooter {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 50px;
+}
+
+.totalPrice {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 2rem;
+}
+
+.checkDetailsBtn {
+    padding: 0.5rem 1rem;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 0 0 10px 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.checkDetailsBtn:hover {
+    background-color: #0056b3;
+}

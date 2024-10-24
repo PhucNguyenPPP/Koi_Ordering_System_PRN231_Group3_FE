@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import useAuth from '../../../hooks/useAuth';
-import { CircularProgress, TextField, debounce} from '@mui/material';
+import { CircularProgress, Pagination, TextField, debounce } from '@mui/material';
 import { MoreHorizontalIcon } from 'lucide-react';
 import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate } from 'react-router-dom';
@@ -42,16 +42,24 @@ const OrderListStorageManager = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [totalPage, setTotalPage] = useState(0);
     const navigate = useNavigate();
 
     const fetchAllOrderOfStorage = async () => {
-        const response = await GetAllOrderOfStorage(user.storageProvinceId, searchQuery);
+        const response = await GetAllOrderOfStorage(user.storageProvinceId, searchQuery, currentPage, rowsPerPage);
         const responseData = await response.json();
         if (response.ok) {
-            setOrderList(responseData);
+            setOrderList(responseData.value);
+            setTotalPage(Math.ceil(responseData['@odata.count'] / rowsPerPage));
         } else if (response.status === 404) {
             setOrderList([]);
+            setCurrentPage(0);
+            setTotalPage(0);
         } else {
+            setCurrentPage(0);
+            setTotalPage(0);
             console.log("Error when fetch get all  order of storage")
         }
     };
@@ -63,7 +71,7 @@ const OrderListStorageManager = () => {
             fetchAllOrderOfStorage();
             setIsLoading(false);
         }
-    }, [user, searchQuery]);
+    }, [user, searchQuery, currentPage]);
 
     const formatPriceVND = (price) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -83,6 +91,7 @@ const OrderListStorageManager = () => {
     };
 
     const handleSearchChange = debounce((e) => {
+        setCurrentPage(1);
         setSearchQuery(e.target.value);
     }, 500);
 
@@ -90,6 +99,10 @@ const OrderListStorageManager = () => {
         const orderId = selectedOrder.orderId
         navigate('/order-detail-storage', { state: { orderId } });
         handleMenuClose();
+    };
+
+    const handlePageChange = (event, page) => {
+        setCurrentPage(page);
     };
 
     if (isLoading) {
@@ -127,15 +140,15 @@ const OrderListStorageManager = () => {
                         </TableHead>
                         <TableBody>
                             {orderList.length > 0 ? orderList.map((order) => (
-                                <StyledTableRow key={order.orderId}>
+                                <StyledTableRow key={order.OrderId}>
                                     <StyledTableCell component="th" scope="row">
-                                        <p className='font-semibold'>{order.orderNumber}</p>
+                                        <p className='font-semibold'>{order.OrderNumber}</p>
                                     </StyledTableCell>
-                                    <StyledTableCell>{order.customerName}</StyledTableCell>
-                                    <StyledTableCell>{order.farmName}</StyledTableCell>
-                                    <StyledTableCell>{formatDate(order.createdDate)}</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold'}}>{formatPriceVND(order.totalPrice)}</StyledTableCell>
-                                    <StyledTableCell align="center">{order.status}</StyledTableCell>
+                                    <StyledTableCell>{order.CustomerName}</StyledTableCell>
+                                    <StyledTableCell>{order.FarmName}</StyledTableCell>
+                                    <StyledTableCell>{formatDate(order.CreatedDate)}</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold' }}>{formatPriceVND(order.TotalPrice)}</StyledTableCell>
+                                    <StyledTableCell align="center">{order.Status}</StyledTableCell>
                                     <StyledTableCell align="right">
                                         <IconButton onClick={(event) => handleMenuClick(event, order)}>
                                             <MoreHorizontalIcon />
@@ -152,6 +165,13 @@ const OrderListStorageManager = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <div className='flex justify-center mt-5'>
+                    <Pagination
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        count={totalPage}
+                    />
+                </div>
             </div>
             <Menu
                 anchorEl={anchorEl}

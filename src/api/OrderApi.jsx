@@ -23,9 +23,10 @@ export const CreateOrder = async (data, customerId, kois) => {
     }
 };
 
-export const GetAllCustomerHistoryOrder = async (customerId) => {
+export const GetAllCustomerHistoryOrder = async (customerId, currentPage, rowsPerPage) => {
     try {
-        const url = `${baseUrl}/odata/all-customer-history-order?customerId=${customerId}&$orderby=createdDate desc`;
+        const skip = (currentPage - 1) * rowsPerPage;
+        var url = `${baseUrl}/odata/all-customer-history-order?customerId=${customerId}&$top=${rowsPerPage}&$skip=${skip}&$count=true&$orderby=createdDate desc`;
         const request = {
             method: "GET",
             headers: {
@@ -40,9 +41,10 @@ export const GetAllCustomerHistoryOrder = async (customerId) => {
     }
 };
 
-export const GetAllFarmHistoryOrder = async (farmId, searchQuery) => {
+export const GetAllFarmHistoryOrder = async (farmId, searchQuery, currentPage, rowsPerPage) => {
     try {
-        var url = `${baseUrl}/odata/all-farm-history-order?farmId=${farmId}&$orderby=createdDate desc`;
+        const skip = (currentPage - 1) * rowsPerPage;
+        var url = `${baseUrl}/odata/all-farm-history-order?farmId=${farmId}&$top=${rowsPerPage}&$skip=${skip}&$count=true&$orderby=createdDate desc`;
         if(searchQuery != ''){
             url += `&$filter=contains(customerName,'${searchQuery}')`
         }
@@ -60,9 +62,10 @@ export const GetAllFarmHistoryOrder = async (farmId, searchQuery) => {
     }
 };
 
-export const GetAllOrderOfStorage = async (storageProvinceId, searchQuery) => {
+export const GetAllOrderOfStorage = async (storageProvinceId, searchQuery, currentPage, rowsPerPage) => {
     try {
-        var url = `${baseUrl}/odata/all-storage-history-order?storageProvinceId=${storageProvinceId}&$orderby=createdDate desc`;
+        const skip = (currentPage - 1) * rowsPerPage;
+        var url = `${baseUrl}/odata/all-storage-history-order?storageProvinceId=${storageProvinceId}&$top=${rowsPerPage}&$skip=${skip}&$count=true&$orderby=createdDate desc`;
         if(searchQuery != ''){
             url += `&$filter=contains(customerName,'${searchQuery}')`
         }

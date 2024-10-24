@@ -21,6 +21,7 @@ import OrderDetailFarmPage from "../pages/OrderFarmPage/OrderDetailFarmPage";
 import HomeStorageManagerPage from "../pages/HomePage/HomeStorageManagerPage";
 import OrderListStorageManagerPage from "../pages/OrderStorageManagerPage/OrderListStorageManagerPage";
 import OrderDetailStorageManagerPage from "../pages/OrderStorageManagerPage/OrderDetailStorageManagerPage";
+import ShipperManagementPage from "../pages/ShipperManagementPage.jsx/ShipperManagementPage";
 
 export const router = createBrowserRouter([
   {
@@ -116,6 +117,10 @@ export const router = createBrowserRouter([
   },
   { path: "/order-detail-storage", 
     element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><OrderDetailStorageManagerPage /></RoleBasedGuard>,
+    errorElement: <Error/> 
+  },
+  { path: "/shipper-management", 
+    element: <RoleBasedGuard accessibleRoles={['StorageManager']} status="Active" ><ShipperManagementPage /></RoleBasedGuard>,
     errorElement: <Error/> 
   }
 ]);

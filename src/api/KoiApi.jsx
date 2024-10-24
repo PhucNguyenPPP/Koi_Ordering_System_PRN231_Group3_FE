@@ -32,11 +32,12 @@ export const GetKoiByKoiId = async (koiId) => {
     }
 };
 
-export const GetAllKoiOfFarm = async (farmId, searchQuery) => {
+export const GetAllKoiOfFarm = async (farmId, searchQuery, currentPage, rowsPerPage) => {
     try {
-        var url = `${baseUrl}/odata/all-koi-koifarm?farmId=${farmId}`;
+        const skip = (currentPage - 1) * rowsPerPage;
+        var url = `${baseUrl}/odata/all-koi-koifarm?farmId=${farmId}&$top=${rowsPerPage}&$skip=${skip}&$count=true`;
         if(searchQuery != ''){
-            url += `$filter=Name eq '${searchQuery}'`
+            url += `&$filter=contains(Name,'${searchQuery}')`
         }
         const request = {
             method: "GET",

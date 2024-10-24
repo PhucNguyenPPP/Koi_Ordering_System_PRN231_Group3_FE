@@ -134,6 +134,38 @@ export const RegisterKoiFarm = (data) => {
         });
 };
 
+export const RegisterShipper = (data, storageProvinceId) => {
+    const formData = new FormData();
+    formData.append('UserName', data.username);
+    formData.append('Password', data.password);
+    formData.append('FullName', data.fullName);
+    formData.append('Phone', data.phone);
+    formData.append('Address', data.address);
+    formData.append('Email', data.email);
+    formData.append('DateOfBirth', data.dateOfBirth);
+    formData.append('Gender', data.Gender);
+    formData.append('AvatarLink', data.avatar[0]);
+    formData.append('StorageProvinceId', storageProvinceId);
+
+    const url = `${baseUrl}/api/Auth/new-shipper`;
+    const request = {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'accept': '*/*',
+        },
+    };
+
+    return fetch(url, request)
+        .then(response => {
+            return response;
+        })
+        .catch(err => {
+            console.error(err);
+            throw err;
+        });
+};
+
 export const Logout = async (refreshToken) => {
     try {
         const url = `${baseUrl}/api/Auth/logout?rfToken=${refreshToken}`;

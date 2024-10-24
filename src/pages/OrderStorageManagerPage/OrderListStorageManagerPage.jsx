@@ -1,13 +1,12 @@
-import LayoutKoiManager from "../../components/layouts/LayoutKoiManager";
-import OrderListFarm from "../../components/partial/OrderFarmPage/OrderListFarm";
+import LayoutStorageManager from "../../components/layouts/LayoutStorageManager";
 import OrderListStorageManager from "../../components/partial/OrderStorageManagerPage/OrderListStorageManager";
 
 const OrderListStorageManagerPage = () => {
     return (
-        <LayoutKoiManager>
+        <LayoutStorageManager>
             <OrderListStorageManager />
-        </LayoutKoiManager>
+        </LayoutStorageManager>
     );
 };
 
-export default  OrderListStorageManagerPage;
+export default OrderListStorageManagerPage;

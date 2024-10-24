@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Pagination } from '@mui/material';
 import useAuth from '../../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import styles from './orderlist.module.scss';
@@ -9,6 +9,9 @@ import { useNavigate } from 'react-router-dom';
 function OrderListCustomer() {
     const [isLoading, setIsLoading] = useState(false);
     const [orders, setOrders] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [totalPage, setTotalPage] = useState(0);
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -17,11 +20,14 @@ function OrderListCustomer() {
     };
 
     const fetchGetAllCustomerHistoryOrder = async () => {
-        const response = await GetAllCustomerHistoryOrder(user.userId)
-        if(response.ok){
+        const response = await GetAllCustomerHistoryOrder(user.userId, currentPage, rowsPerPage)
+        if (response.ok) {
             const responseData = await response.json();
-            setOrders(responseData);
+            setOrders(responseData.value);
+            setTotalPage(Math.ceil(responseData['@odata.count'] / rowsPerPage));
         } else {
+            setCurrentPage(0);
+            setTotalPage(0);
             console.log("Error when fetch get all customer history order")
         }
 
@@ -33,11 +39,15 @@ function OrderListCustomer() {
             fetchGetAllCustomerHistoryOrder();
             setIsLoading(false);
         }
-        
-    }, [user]);
+
+    }, [user, currentPage]);
 
     const handleCheckDetail = (orderId) => {
         navigate('/order-detail', { state: { orderId } });
+    };
+
+    const handlePageChange = (event, page) => {
+        setCurrentPage(page);
     };
 
     if (isLoading) {
@@ -51,25 +61,25 @@ function OrderListCustomer() {
     return (
         <div className={styles.backgroundContainer}>
             {orders && orders.map((order) => (
-                <div key={order.orderId} className={styles.sectionItemContainer}>
+                <div key={order.OrderId} className={styles.sectionItemContainer}>
                     {/* Header của item */}
                     <div className={styles.itemHeader}>
-                        <div className={styles.shopName}>{order.farmName}</div>
-                        <div className={styles.orderStatus}>{order.status}</div>
+                        <div className={styles.shopName}>{order.FarmName}</div>
+                        <div className={styles.orderStatus}>{order.Status}</div>
                     </div>
 
                     {/* Nội dung chính của item */}
                     <div className={styles.itemBody}>
-                        {order.kois && order.kois.map((koi, index) => (
+                        {order.Kois && order.Kois.map((koi, index) => (
                             <div key={index} className={styles.fishList}>
                                 <img
                                     className={styles.fishImage}
-                                    src={koi.avatarLink}
-                                    alt={koi.name}
+                                    src={koi.AvatarLink}
+                                    alt={koi.Name}
                                 />
                                 <div className={styles.fishDetails}>
-                                    <div className={styles.fishName}>{koi.name}</div>
-                                    <div className={styles.fishPrice}>{formatPriceVND(koi.price)}</div>
+                                    <div className={styles.fishName}>{koi.Name}</div>
+                                    <div className={styles.fishPrice}>{formatPriceVND(koi.Price)}</div>
                                 </div>
                             </div>
                         ))}
@@ -78,14 +88,21 @@ function OrderListCustomer() {
                     {/* Footer của item */}
                     <div className={styles.itemFooter}>
                         <div className={styles.totalPrice}>
-                            Order Total: <span style={{ color: '#C71125' }}>{formatPriceVND(order.totalPrice)}</span>
+                            Order Total: <span style={{ color: '#C71125' }}>{formatPriceVND(order.TotalPrice)}</span>
                         </div>
                     </div>
-                    <button className={styles.checkDetailsBtn} onClick={() => handleCheckDetail(order.orderId)}>
+                    <button className={styles.checkDetailsBtn} onClick={() => handleCheckDetail(order.OrderId)}>
                         Check Details
                     </button>
                 </div>
             ))}
+            <div className='flex justify-center mt-5'>
+                <Pagination
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    count={totalPage}
+                />
+            </div>
         </div>
     );
 }

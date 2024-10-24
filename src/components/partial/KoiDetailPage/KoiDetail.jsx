@@ -39,7 +39,7 @@ function KoiDetail() {
                 const response = await GetAllKoi();
                 const responseData = await response.json();
                 if (response.ok) {
-                    const filteredKoiList = responseData.filter(koi => koi.koiId !== koiId);
+                    const filteredKoiList = responseData.value.filter(koi => koi.KoiId !== koiId);
                     setKoiList(filteredKoiList);
                 } else if (response.status === 404) {
                     setKoiList([]);
@@ -114,7 +114,7 @@ function KoiDetail() {
                     <p><strong>Age:</strong> {koiDetail.age}</p>
                     <p><strong>Certification: </strong>
                         <a
-                            href={koiDetail.certificationLink}
+                            href={koiDetail.CertificationLink}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="underline text-blue-500"
@@ -123,7 +123,7 @@ function KoiDetail() {
                         </a>
                     </p>
 
-                    <p><strong>Description:</strong> {koiDetail.description}</p>
+                    <p><strong>Description:</strong> {koiDetail.Description}</p>
 
                     <div className={styles.buttonGroup}>
                         <button className={styles.addToCartButton} onClick={handleAddToCart}>
@@ -159,20 +159,20 @@ function KoiDetail() {
                 <div className="grid grid-cols-5 gap-4">
                     {koiList && koiList.length > 0 && koiList.map((koi, index) => (
                         <div
-                            key={koi.koiId}
+                            key={koi.KoiId}
                             className="border p-3 rounded shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl hover:bg-gray-100"
-                            onClick={() => handleKoiDetail(koi.koiId)}
+                            onClick={() => handleKoiDetail(koi.KoiId)}
                         >
                             <img
-                                src={koi.avatarLink}
-                                alt={koi.name}
+                                src={koi.AvatarLink}
+                                alt={koi.Name}
                                 className="mb-3 w-full h-fit object-cover"
                             />
-                            <h3 className="text-lg font-bold">{koi.name}</h3>
-                            <p><strong>Price:</strong> {formatPriceVND(koi.price)}</p>
-                            <p><strong>Gender:</strong> {koi.gender}</p>
-                            <p><strong>Breed:</strong> {koi.breedName.join(', ')}</p>
-                            <p><strong>Farm:</strong> {koi.farmName}</p>
+                            <h3 className="text-lg font-bold">{koi.Name}</h3>
+                            <p><strong>Price:</strong> {formatPriceVND(koi.Price)}</p>
+                            <p><strong>Gender:</strong> {koi.Gender}</p>
+                            <p><strong>Breed:</strong> {koi.BreedName.join(', ')}</p>
+                            <p><strong>Farm:</strong> {koi.FarmName}</p>
                         </div>
                     ))}
                 </div>

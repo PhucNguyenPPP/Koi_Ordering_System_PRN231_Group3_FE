@@ -14,7 +14,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import useAuth from '../../../hooks/useAuth';
 import { CreateKoi, DeleteKoi, GetAllKoiOfFarm, UpdateKoi } from '../../../api/KoiApi';
-import { CircularProgress, Button, TextField, debounce, Modal, RadioGroup, FormControlLabel, Radio, Checkbox, FormControl, InputLabel, Input, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { CircularProgress, Button, TextField, debounce, Modal, RadioGroup, FormControlLabel, Radio, Checkbox, FormControl, InputLabel, Input, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Pagination } from '@mui/material';
 import { MoreHorizontalIcon } from 'lucide-react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
@@ -52,16 +52,22 @@ const KoiManagement = () => {
     const [openModalCreateKoi, setOpenModalCreateKoi] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [totalPage, setTotalPage] = useState(0);
     const { handleSubmit: handleSubmitCreateKoi, control: controlCreateKoi, register: registerCreateKoi, reset, formState: { errors } } = useForm();
     const navigate = useNavigate();
 
     const fetchAllKoiListOfFarm = async () => {
-        const response = await GetAllKoiOfFarm(user.farmId, searchQuery);
+        const response = await GetAllKoiOfFarm(user.farmId, searchQuery, currentPage, rowsPerPage);
         const responseData = await response.json();
         if (response.ok) {
-            setKoiList(responseData);
+            setKoiList(responseData.value);
+            setTotalPage(Math.ceil(responseData['@odata.count'] / rowsPerPage))
         } else if (response.status === 404) {
             setKoiList([]);
+            setCurrentPage(0);
+            setTotalPage(0);
         }
     };
 
@@ -82,7 +88,7 @@ const KoiManagement = () => {
             fetchGetAllBreed();
             setIsLoading(false);
         }
-    }, [user, searchQuery]);
+    }, [user, searchQuery, currentPage]);
 
     const getTodayDate = () => {
         const today = new Date();
@@ -108,11 +114,12 @@ const KoiManagement = () => {
     };
 
     const handleSearchChange = debounce((e) => {
+        setCurrentPage(1);
         setSearchQuery(e.target.value);
     }, 500);
 
     const handleDetail = () => {
-        const koiId = selectedKoi.koiId
+        const koiId = selectedKoi.KoiId
         navigate('/koi-detail-management', { state: { koiId } });
         handleMenuClose();
     };
@@ -120,12 +127,12 @@ const KoiManagement = () => {
     const handleEdit = () => {
         setIsEditing(true);
         reset({
-            koiName: selectedKoi.name,
-            koiPrice: selectedKoi.price,
-            koiDescription: selectedKoi.description,
-            koiDateOfBirth: selectedKoi.dob.split('T')[0],
+            koiName: selectedKoi.Name,
+            koiPrice: selectedKoi.Price,
+            koiDescription: selectedKoi.Description,
+            koiDateOfBirth: selectedKoi.Dob.split('T')[0],
         });
-        setSelectedBreedIds(selectedKoi.breedId);
+        setSelectedBreedIds(selectedKoi.BreedId);
         setOpenModalCreateKoi(true);
         handleMenuClose();
     };
@@ -146,7 +153,7 @@ const KoiManagement = () => {
 
     const handleFetchDelete = async () => {
         setIsLoading(true);
-        const response = await DeleteKoi(selectedKoi.koiId)
+        const response = await DeleteKoi(selectedKoi.KoiId)
         if (response.ok) {
             fetchAllKoiListOfFarm();
             handleCloseDeleteConfirmation();
@@ -193,7 +200,7 @@ const KoiManagement = () => {
         if (isEditing) {
             const fetchUpdateKoi = async () => {
                 setIsLoading(true);
-                const response = await UpdateKoi(selectedKoi.koiId, koiData)
+                const response = await UpdateKoi(selectedKoi.KoiId, koiData)
                 if (response.ok) {
                     reset();
                     fetchAllKoiListOfFarm();
@@ -229,7 +236,11 @@ const KoiManagement = () => {
 
     };
 
-    const filteredKoiList = koiList.filter(koi => koi.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const handlePageChange = (event, page) => {
+        setCurrentPage(page);
+    };
+
+    // const filteredKoiList = koiList.filter(koi => koi.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     if (isLoading) {
         return (
@@ -269,20 +280,20 @@ const KoiManagement = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredKoiList.length > 0 ? filteredKoiList.map((koi) => (
-                                <StyledTableRow key={koi.koiId}>
+                            {koiList.length > 0 ? koiList.map((koi) => (
+                                <StyledTableRow key={koi.KoiId}>
                                     <StyledTableCell component="th" scope="row">
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                             <img
-                                                src={koi.avatarLink}
-                                                alt={koi.name}
+                                                src={koi.AvatarLink}
+                                                alt={koi.Name}
                                                 style={{ width: '80px', height: '180px', objectFit: 'cover', marginRight: '10px' }}
                                             />
-                                            <p className='font-semibold'>{koi.name}</p>
+                                            <p className='font-semibold'>{koi.Name}</p>
                                         </div>
                                     </StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold' }} align="right">{formatPriceVND(koi.price)}</StyledTableCell>
-                                    <StyledTableCell align="right">{!koi.orderId ? "In Stock" : "Is Bought"}</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold' }} align="right">{formatPriceVND(koi.Price)}</StyledTableCell>
+                                    <StyledTableCell align="right">{!koi.OrderId ? "In Stock" : "Is Bought"}</StyledTableCell>
                                     <StyledTableCell align="right">
                                         <IconButton onClick={(event) => handleMenuClick(event, koi)}>
                                             <MoreHorizontalIcon />
@@ -299,6 +310,14 @@ const KoiManagement = () => {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                <div className='flex justify-center mt-5'>
+                    <Pagination
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        count={totalPage}
+                    />
+                </div>
             </div>
             <Menu
                 anchorEl={anchorEl}
@@ -306,7 +325,7 @@ const KoiManagement = () => {
                 onClose={handleMenuClose}
             >
                 <MenuItem style={{ color: 'blue' }} onClick={handleDetail}><InfoIcon className='mr-1' /> Detail</MenuItem>
-                {selectedKoi && selectedKoi.status && (
+                {selectedKoi && selectedKoi.Status && (
                     <>
                         <MenuItem style={{ color: 'orange' }} onClick={handleEdit}><EditIcon className='mr-1' /> Edit</MenuItem>
                         <MenuItem style={{ color: 'red' }} onClick={handleDelete}><DeleteIcon className='mr-1' /> Delete</MenuItem>

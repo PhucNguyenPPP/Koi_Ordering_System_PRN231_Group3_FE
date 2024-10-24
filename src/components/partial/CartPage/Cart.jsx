@@ -47,7 +47,7 @@ const CartPage = () => {
       currency: "VND",
     }).format(price);
   };
-  //change github
+  //change github2
 
   const handleCheckboxToggle = (cartId) => {
     setCheckedItems((prevCheckedItems) => {

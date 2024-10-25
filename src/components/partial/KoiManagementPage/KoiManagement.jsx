@@ -302,7 +302,7 @@ const KoiManagement = () => {
                                 </StyledTableRow>
                             )) : (
                                 <StyledTableRow>
-                                    <StyledTableCell colSpan={4} align="center">
+                                    <StyledTableCell colSpan={10} align="center">
                                         No koi found.
                                     </StyledTableCell>
                                 </StyledTableRow>

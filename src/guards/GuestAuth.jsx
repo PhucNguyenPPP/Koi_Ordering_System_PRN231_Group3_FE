@@ -12,6 +12,8 @@ export default function GuestAuth({ children }) {
       return <Navigate to="/home-storage-manager" />;
     } else if (user && user?.roleName == "Admin") {
       return <Navigate to="/home-admin" />;
+    } else if (user && user?.roleName == "Shipper") {
+      return <Navigate to="/home-shipper" />;
     }
     return <Navigate to="/" />;
   }

@@ -14,12 +14,6 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import useAuth from "../../../hooks/useAuth";
 import {
-  CreateKoi,
-  DeleteKoi,
-  GetAllKoiOfFarm,
-  UpdateKoi,
-} from "../../../api/KoiApi";
-import {
   CircularProgress,
   Button,
   TextField,
@@ -38,8 +32,6 @@ import {
   DialogContentText,
   DialogActions,
   Pagination,
-  Select,
-  FormHelperText,
 } from "@mui/material";
 import { MoreHorizontalIcon } from "lucide-react";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -47,15 +39,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import { toast } from "react-toastify";
 import SearchIcon from "@mui/icons-material/Search";
 import { useForm, Controller, set } from "react-hook-form";
-import { GetAllBreed } from "../../../api/BreedApi";
 import { useNavigate } from "react-router-dom";
-import {
-  CreateFlight,
-  GetAllFlight,
-  UpdateFlight,
-} from "../../../api/FlightApi";
-import { GetAllAirport } from "../../../api/AirportApi";
-import dayjs from "dayjs";
+import { GetAllFlight } from "../../../api/FlightApi";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -73,15 +58,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const FlightManagement = () => {
-  const [flightList, setFlightList] = useState([]);
-  const [airportList, setAirportList] = useState([]);
+const PolicyManagement = () => {
+  const [policyList, setPolicyList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedFlight, setSelectedFlight] = useState(null);
+  const [selectedPolicy, setSelectedPolicy] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [openModalCreateFlight, setOpenModalCreateFlight] = useState(false);
+  const [openModalCreatePolicy, setOpenModalCreatePolicy] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -102,20 +86,10 @@ const FlightManagement = () => {
     if (response.ok) {
       setFlightList(responseData.value);
       setTotalPage(Math.ceil(responseData["@odata.count"] / rowsPerPage));
-    } else {
+    } else if (response.status === 404) {
       setFlightList([]);
       setCurrentPage(0);
       setTotalPage(0);
-    }
-  };
-
-  const fetchAllAirports = async () => {
-    const response = await GetAllAirport();
-    const responseData = await response.json();
-    if (response.ok) {
-      setAirportList(responseData.value);
-    } else {
-      setAirportList([]);
     }
   };
 
@@ -123,7 +97,6 @@ const FlightManagement = () => {
     if (user) {
       setIsLoading(true);
       fetchAllFlight();
-      fetchAllAirports();
       setIsLoading(false);
     }
   }, [user, searchQuery, currentPage]);
@@ -163,12 +136,9 @@ const FlightManagement = () => {
     setIsEditing(true);
     reset({
       flightId: selectedFlight.FlightId,
-      flightCode: selectedFlight.FlightCode,
       airline: selectedFlight.Airline,
-      departureDate: dayjs(selectedFlight.DepartureDate).format(
-        "YYYY-MM-DDTHH:mm"
-      ),
-      arrivalDate: dayjs(selectedFlight.ArrivalDate).format("YYYY-MM-DDTHH:mm"),
+      departureDate: selectedFlight.DepartureDate,
+      arrivalDate: selectedFlight.ArrivalDate,
       departureAirportId: selectedFlight.DepartureAirportId,
       arrivalAirportId: selectedFlight.ArrivalAirportId,
     });
@@ -210,7 +180,6 @@ const FlightManagement = () => {
     setSelectedFlight(null);
     reset({
       flightId: "",
-      flightCode: "",
       airline: "",
       departureDate: "",
       arrivalDate: "",
@@ -220,60 +189,44 @@ const FlightManagement = () => {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
-    if (isEditing) {
-      const dataJson = {
-        flightId: selectedFlight.FlightId,
-        flightCode: data.flightCode,
-        airline: data.airline,
-        departureDate: data.departureDate,
-        arrivalDate: data.arrivalDate,
-        departureAirportId: data.departureAirportId,
-        arrivalAirportId: data.arrivalAirportId,
-      };
-
-      const fetchUpdateKoi = async () => {
-        setIsLoading(true);
-        const response = await UpdateFlight(dataJson);
-        if (response.ok) {
-          reset();
-          fetchAllAirports();
-          fetchAllFlight();
-          handleCloseModalCreateFlight();
-          toast.success("Update flight successfully");
-        } else {
-          const responseData = await response.json();
-          toast.error(responseData.message);
-        }
-        setIsLoading(false);
-      };
-      fetchUpdateKoi();
-    } else {
-      const dataJson = {
-        flightCode: data.flightCode,
-        airline: data.airline,
-        departureDate: data.departureDate,
-        arrivalDate: data.arrivalDate,
-        departureAirportId: data.departureAirportId,
-        arrivalAirportId: data.arrivalAirportId,
-      };
-      const fetchCreateFlight = async () => {
-        setIsLoading(true);
-        const response = await CreateFlight(dataJson);
-        if (response.ok) {
-          reset();
-          toast.success("Create flight successfully");
-          fetchAllAirports();
-          fetchAllFlight();
-          handleCloseModalCreateFlight();
-        } else {
-          const responseData = await response.json();
-          toast.error(responseData.message);
-        }
-        setIsLoading(false);
-      };
-      fetchCreateFlight();
-    }
+    // const koiData = {
+    //   ...data,
+    //   breedList: selectedBreedIds,
+    // };
+    // if (isEditing) {
+    //   const fetchUpdateKoi = async () => {
+    //     setIsLoading(true);
+    //     const response = await UpdateKoi(selectedKoi.KoiId, koiData);
+    //     if (response.ok) {
+    //       reset();
+    //       fetchAllKoiListOfFarm();
+    //       handleCloseModalCreateKoi();
+    //       toast.success("Update Koi successfully");
+    //     } else {
+    //       const responseData = await response.json();
+    //       toast.error("Update Koi failed: " + responseData.message);
+    //     }
+    //     setIsLoading(false);
+    //   };
+    //   fetchUpdateKoi();
+    // } else {
+    //   const fetchCreateKoi = async () => {
+    //     setIsLoading(true);
+    //     const response = await CreateKoi(koiData, user.farmId);
+    //     if (response.ok) {
+    //       reset();
+    //       setSelectedBreedIds([]);
+    //       toast.success("Create Koi successfully");
+    //       fetchAllKoiListOfFarm();
+    //       handleCloseModalCreateKoi();
+    //     } else {
+    //       const responseData = await response.json();
+    //       toast.error("Create Koi failed: " + responseData.message);
+    //     }
+    //     setIsLoading(false);
+    //   };
+    //   fetchCreateKoi();
+    // }
   };
 
   const handlePageChange = (event, page) => {
@@ -295,7 +248,7 @@ const FlightManagement = () => {
       <div className={styles.koiContentContainer}>
         <div className="flex justify-between items-center mb-4">
           <TextField
-            label="Search by flight codes"
+            label="Search Koi"
             variant="outlined"
             defaultValue={searchQuery}
             onChange={handleSearchChange}
@@ -316,13 +269,7 @@ const FlightManagement = () => {
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
                 >
-                  Flight Code
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ fontWeight: "bold", fontSize: "20px" }}
-                  align="right"
-                >
-                  Airline
+                  FlightId
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
@@ -361,7 +308,7 @@ const FlightManagement = () => {
                 flightList.map((flight) => (
                   <StyledTableRow key={flight.FlightId}>
                     <StyledTableCell component="th" scope="row">
-                      <p className="font-semibold">{flight.FlightCode}</p>
+                      <p className="font-semibold">{flight.FlightId}</p>
                     </StyledTableCell>
                     <StyledTableCell
                       style={{ fontWeight: "bold" }}
@@ -370,10 +317,10 @@ const FlightManagement = () => {
                       {flight.Airline}
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      {dayjs(flight.DepartureDate).format("DD-MM-YYYY HH:mm")}
+                      {flight.DepartureDate}
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      {dayjs(flight.ArrivalDate).format("DD-MM-YYYY HH:mm")}
+                      {flight.ArrivalDate}
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       {flight.DepartureAirportName}
@@ -392,7 +339,7 @@ const FlightManagement = () => {
                 ))
               ) : (
                 <StyledTableRow>
-                  <StyledTableCell colSpan={10} align="center">
+                  <StyledTableCell colSpan={4} align="center">
                     No flight found.
                   </StyledTableCell>
                 </StyledTableRow>
@@ -437,7 +384,7 @@ const FlightManagement = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-2 gap-4">
                 <Controller
-                  name="flightCode"
+                  name="flightId"
                   control={control}
                   defaultValue=""
                   rules={{
@@ -446,12 +393,12 @@ const FlightManagement = () => {
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="Flight Code"
+                      label="Flight ID"
                       variant="outlined"
                       fullWidth
                       margin="normal"
-                      error={!!errors.flightCode}
-                      helperText={errors.flightCode?.message}
+                      error={!!errors.flightId}
+                      helperText={errors.flightId?.message}
                     />
                   )}
                 />
@@ -469,6 +416,7 @@ const FlightManagement = () => {
                       variant="outlined"
                       fullWidth
                       margin="normal"
+                      type="number"
                       error={!!errors.airline}
                       helperText={errors.airline?.message}
                     />
@@ -514,65 +462,6 @@ const FlightManagement = () => {
                     />
                   )}
                 />
-                <Controller
-                  name="departureAirportId"
-                  control={control}
-                  rules={{ required: "Please input departure airport" }}
-                  render={({ field, fieldState: { error } }) => (
-                    <FormControl
-                      fullWidth
-                      variant="outlined"
-                      margin="normal"
-                      error={!!error}
-                    >
-                      <InputLabel>Departure Airport</InputLabel>
-                      <Select {...field} label="Departure Airport">
-                        {airportList &&
-                          airportList.map((airport) => (
-                            <MenuItem
-                              key={airport.AirportId}
-                              value={airport.AirportId}
-                            >
-                              {airport.AirportName}
-                            </MenuItem>
-                          ))}
-                      </Select>
-                      {error && (
-                        <FormHelperText>{error.message}</FormHelperText>
-                      )}{" "}
-                    </FormControl>
-                  )}
-                />
-                <Controller
-                  name="arrivalAirportId"
-                  control={control}
-                  rules={{ required: "Please input arrival airport" }}
-                  render={({ field, fieldState: { error } }) => (
-                    <FormControl
-                      fullWidth
-                      variant="outlined"
-                      margin="normal"
-                      error={!!error}
-                    >
-                      <InputLabel>Arrival Airport</InputLabel>
-                      <Select {...field} label="Arrival Airport">
-                        {airportList &&
-                          airportList.map((airport) => (
-                            <MenuItem
-                              key={airport.AirportId}
-                              value={airport.AirportId}
-                            >
-                              {airport.AirportName}
-                            </MenuItem>
-                          ))}
-                      </Select>
-                      {error && (
-                        <FormHelperText>{error.message}</FormHelperText>
-                      )}{" "}
-                      {/* Show error message */}
-                    </FormControl>
-                  )}
-                />
               </div>
               <div className="flex justify-end mt-4">
                 <Button
@@ -600,7 +489,7 @@ const FlightManagement = () => {
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this Koi?
+            Are you sure you want to delete this policy?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -619,4 +508,4 @@ const FlightManagement = () => {
   );
 };
 
-export default FlightManagement;
+export default PolicyManagement;

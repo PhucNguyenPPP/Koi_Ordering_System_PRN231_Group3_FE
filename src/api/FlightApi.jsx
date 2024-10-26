@@ -5,7 +5,7 @@ export const GetAllFlight = async (searchQuery, currentPage, rowsPerPage) => {
     const skip = (currentPage - 1) * rowsPerPage;
     var url = `${baseUrl}/odata/flights?`;
     if (searchQuery != "") {
-      url += `&$filter=contains(flightId,'${searchQuery}')`;
+      url += `&$filter=contains(flightCode,'${searchQuery}')`;
     }
     url += `&$top=${rowsPerPage}&$skip=${skip}&$count=true`;
 
@@ -20,4 +20,44 @@ export const GetAllFlight = async (searchQuery, currentPage, rowsPerPage) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+export const CreateFlight = async (data) => {
+  const url = `${baseUrl}/odata/new-flight`;
+  const request = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  };
+
+  return fetch(url, request)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+};
+
+export const UpdateFlight = async (data) => {
+  const url = `${baseUrl}/odata/flight`;
+  const request = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  };
+
+  return fetch(url, request)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
 };

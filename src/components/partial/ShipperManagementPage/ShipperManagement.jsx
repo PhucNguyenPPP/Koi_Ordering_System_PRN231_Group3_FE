@@ -75,7 +75,6 @@ const ShipperManagement = () => {
   } = useForm();
 
   const fetchAllShipperOfStorage = async () => {
-    console.log(currentPage);
     const response = await GetAllShipperOfStorage(
       user.storageProvinceId,
       searchQuery,
@@ -141,13 +140,13 @@ const ShipperManagement = () => {
     const response = await RegisterShipper(data, user.storageProvinceId);
     if (response.ok) {
       toast.success("Create shipper successfully");
+      handleCloseModalCreateShipper();
     } else {
       const responseData = await response.json();
       toast.error(responseData.message);
     }
     fetchAllShipperOfStorage();
     setIsLoading(false);
-    handleCloseModalCreateShipper();
   };
 
   if (isLoading) {

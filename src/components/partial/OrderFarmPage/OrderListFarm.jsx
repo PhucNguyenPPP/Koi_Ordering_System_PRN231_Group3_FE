@@ -108,7 +108,7 @@ const OrderListFarm = () => {
   }, 500);
 
   const handleDetail = () => {
-    const orderId = selectedOrder.orderId;
+    const orderId = selectedOrder.OrderId;
     navigate("/order-detail-farm", { state: { orderId } });
     handleMenuClose();
   };

@@ -83,6 +83,27 @@ export const GetAllOrderOfStorage = async (storageProvinceId, searchQuery, curre
     }
 };
 
+export const GetAllOrderOfShipper = async (storageProvinceId, searchQuery, currentPage, rowsPerPage) => {
+    try {
+        const skip = (currentPage - 1) * rowsPerPage;
+        var url = `${baseUrl}/odata/all-storage-history-order?storageProvinceId=${storageProvinceId}&$top=${rowsPerPage}&$skip=${skip}&$count=true&$orderby=createdDate desc`;
+        if(searchQuery != ''){
+            url += `&$filter=contains(customerName,'${searchQuery}')`
+        }
+        const request = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 export const GetOrderDetail = async (orderId) => {
     try {
         const url = `${baseUrl}/odata/order-detail?orderId=${orderId}`;
@@ -109,6 +130,41 @@ export const PackOrder = async (data, orderId) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data)
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+export const GetDeliveryOfOrder = async (orderId) => {
+    try {
+        const url = `${baseUrl}/odata/delivery-of-order?orderId=${orderId}`;
+        const request = {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+export const AssignJapaneseShipper = async (data) => {
+    try {
+        const url = `${baseUrl}/odata/Japanese-shipper`;
+        const request = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
         };
         const response = await fetch(url, request);
         

@@ -24,6 +24,7 @@ import OrderDetailStorageManagerPage from "../pages/OrderStorageManagerPage/Orde
 import ShipperManagementPage from "../pages/ShipperManagementPage.jsx/ShipperManagementPage";
 import HomeAdminPage from "../pages/HomePage/HomeAdminPage";
 import FlightMagementPage from "../pages/FlightManagementPage/FlightManagementPage";
+import HomeShipperPage from "../pages/HomePage/HomeShipperPage";
 
 export const router = createBrowserRouter([
   {
@@ -205,6 +206,24 @@ export const router = createBrowserRouter([
     element: (
       <RoleBasedGuard accessibleRoles={["Admin"]} status="Active">
         <FlightMagementPage />
+      </RoleBasedGuard>
+    ),
+    errorElement: <Error />,
+  },
+  {
+    path: "/policy-management",
+    element: (
+      <RoleBasedGuard accessibleRoles={["KoiFarmManager"]} status="Active">
+        <FlightMagementPage />
+      </RoleBasedGuard>
+    ),
+    errorElement: <Error />,
+  },
+  {
+    path: "/home-shipper",
+    element: (
+      <RoleBasedGuard accessibleRoles={["Shipper"]} status="Active">
+        <HomeShipperPage />
       </RoleBasedGuard>
     ),
     errorElement: <Error />,

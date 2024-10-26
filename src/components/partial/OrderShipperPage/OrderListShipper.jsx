@@ -22,7 +22,7 @@ import { MoreHorizontalIcon } from "lucide-react";
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { GetAllOrderOfStorage } from "../../../api/OrderApi";
+import { GetAllOrderOfShipper, GetAllOrderOfStorage } from "../../../api/OrderApi";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,7 +40,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const OrderListStorageManager = () => {
+const OrderListShipper = () => {
   const [orderList, setOrderList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
@@ -52,8 +52,8 @@ const OrderListStorageManager = () => {
   const [totalPage, setTotalPage] = useState(0);
   const navigate = useNavigate();
 
-  const fetchAllOrderOfStorage = async () => {
-    const response = await GetAllOrderOfStorage(
+  const fetchAllOrderOfShipper = async () => {
+    const response = await GetAllOrderOfShipper(
       user.storageProvinceId,
       searchQuery,
       currentPage,
@@ -77,7 +77,7 @@ const OrderListStorageManager = () => {
   useEffect(() => {
     if (user) {
       setIsLoading(true);
-      fetchAllOrderOfStorage();
+      fetchAllOrderOfShipper();
       setIsLoading(false);
     }
   }, [user, searchQuery, currentPage]);
@@ -238,4 +238,4 @@ const OrderListStorageManager = () => {
   );
 };
 
-export default OrderListStorageManager;
+export default OrderListShipper;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styles from "./order-list-storage-manager.module.scss";
+import styles from "./order-list-shipper.module.scss";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -22,7 +22,7 @@ import { MoreHorizontalIcon } from "lucide-react";
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { GetAllOrderOfShipper, GetAllOrderOfStorage } from "../../../api/OrderApi";
+import { GetAllOrderOfShipper } from "../../../api/OrderApi";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -54,7 +54,7 @@ const OrderListShipper = () => {
 
   const fetchAllOrderOfShipper = async () => {
     const response = await GetAllOrderOfShipper(
-      user.storageProvinceId,
+      user.userId,
       searchQuery,
       currentPage,
       rowsPerPage
@@ -70,7 +70,7 @@ const OrderListShipper = () => {
     } else {
       setCurrentPage(0);
       setTotalPage(0);
-      console.log("Error when fetch get all  order of storage");
+      console.log("Error when fetch get all  order of shipper");
     }
   };
 
@@ -109,7 +109,7 @@ const OrderListShipper = () => {
 
   const handleDetail = () => {
     const orderId = selectedOrder.OrderId;
-    navigate("/order-detail-storage", { state: { orderId } });
+    navigate("/order-detail-shipper", { state: { orderId } });
     handleMenuClose();
   };
 

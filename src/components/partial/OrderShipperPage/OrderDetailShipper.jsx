@@ -1,48 +1,24 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Select,
-  MenuItem,
-  Avatar,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
+import { Button, CircularProgress } from "@mui/material";
 import useAuth from "../../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import {
-  AssignJapaneseShipper,
+  ConfirmArrived,
   GetDeliveryOfOrder,
   GetOrderDetail,
 } from "../../../api/OrderApi";
-import styles from "./order-detail-storage-manager.module.scss";
+import styles from "./order-detail-shipper.module.scss";
 import dayjs from "dayjs";
-import { GetAllShipperOfStorage } from "../../../api/ShipperApi";
 import CircleIcon from "@mui/icons-material/Circle";
 
-function OrderDetailStorageManager() {
+function OrderDetailShipper() {
   const [isLoading, setIsLoading] = useState(false);
   const [orderDetail, setOrderDetail] = useState(null);
   const [orderDeliveryList, setOrderDeliveryList] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [shippers, setShippers] = useState([]);
-  const [selectedShipper, setSelectedShipper] = useState("");
-
   const { user } = useAuth();
   const location = useLocation();
   const { orderId } = location.state || {};
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
 
   const formatPriceVND = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -75,55 +51,49 @@ function OrderDetailStorageManager() {
     }
   };
 
-  const fetchShippers = async () => {
-    const response = await GetAllShipperOfStorage(
-      user.storageProvinceId,
-      "",
-      1,
-      100
-    );
-    if (response.ok) {
-      const responseData = await response.json();
-      setShippers(responseData.value);
-    } else if (response.status === 404) {
-      setShippers([]);
-    } else {
-      console.log("Error when fetch get all shipper of storage");
-    }
-  };
-
   useEffect(() => {
     if (orderId) {
       setIsLoading(true);
       fetchGetOrderDetail();
       fetchGetDeliveryOfOrder();
-      fetchShippers();
       setIsLoading(false);
     }
   }, [orderId]);
 
-  const handleAssignShipper = async () => {
-    if (selectedShipper) {
-      const data = {
-        orderId: orderId,
-        shipperId: selectedShipper,
-      };
-      setIsLoading(true);
-      const response = await AssignJapaneseShipper(data);
-      const responseData = await response.json();
-      if (response.ok) {
-        toast.success("Assign shiper successfully");
-        fetchGetOrderDetail();
-        fetchGetDeliveryOfOrder();
-        fetchShippers();
-        setOpenDialog(false);
-      } else {
-        toast.error(responseData.message);
-      }
-      setIsLoading(false);
+  const handleConfirmArrivingStorage = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
     } else {
-      toast.error("Please select a shipper");
+      toast.error(responseData.message);
     }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
+  };
+
+  const handleConfirmArrivingJapanAirport = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
+    } else {
+      toast.error(responseData.message);
+    }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
   };
 
   if (isLoading || !orderId) {
@@ -282,76 +252,45 @@ function OrderDetailStorageManager() {
               </span>
             </div>
 
-            {orderDetail.status === "To Ship" && (
-              <div>
-                <Button
-                  style={{
-                    backgroundColor: "#C71125",
-                    color: "white",
-                    marginTop: "10px",
-                    padding: "10px 30px",
-                  }}
-                  onClick={() => setOpenDialog(true)} // Mở dialog
-                >
-                  Assign Shipper
-                </Button>
-              </div>
-            )}
+            {orderDetail.status === "To Ship" &&
+              user.country ==
+                "Japan"(
+                  <div>
+                    <Button
+                      style={{
+                        backgroundColor: "#C71125",
+                        color: "white",
+                        marginTop: "10px",
+                        padding: "10px 30px",
+                      }}
+                      onClick={() => handleConfirmArrivingStorage()}
+                    >
+                      Confirm Arriving Storage
+                    </Button>
+                  </div>
+                )}
+
+            {orderDetail.status === "Arrive Japan Storage" &&
+              user.country == "Japan" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingJapanAirport()}
+                  >
+                    Confirm Arriving Airport
+                  </Button>
+                </div>
+              )}
           </div>
         </div>
       )}
-
-      {/* Dialog cho việc chọn shipper */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Assign Shipper</DialogTitle>
-        <DialogContent style={{ width: "300px" }}>
-          <div>
-            <Controller
-              name="shipper"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  value={selectedShipper}
-                  onChange={(e) => setSelectedShipper(e.target.value)}
-                  fullWidth
-                >
-                  {shippers &&
-                    shippers.map((shipper) => (
-                      <MenuItem key={shipper.UserId} value={shipper.UserId}>
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          <img
-                            src={shipper.AvatarLink} // Link hình ảnh của shipper
-                            alt={shipper.FullName}
-                            style={{
-                              marginRight: "10px",
-                              width: "80px",
-                              height: "60px",
-                            }}
-                          />
-                          {shipper.FullName}
-                        </div>
-                      </MenuItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAssignShipper}
-            style={{ backgroundColor: "#C71125", color: "white" }}
-          >
-            Assign
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 }
 
-export default OrderDetailStorageManager;
+export default OrderDetailShipper;

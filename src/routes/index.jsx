@@ -25,6 +25,8 @@ import ShipperManagementPage from "../pages/ShipperManagementPage.jsx/ShipperMan
 import HomeAdminPage from "../pages/HomePage/HomeAdminPage";
 import FlightMagementPage from "../pages/FlightManagementPage/FlightManagementPage";
 import HomeShipperPage from "../pages/HomePage/HomeShipperPage";
+import OrderListShipperPage from "../pages/OrderShipperPage/OrderListShipperPage";
+import OrderDetailShipperPage from "../pages/OrderShipperPage/OrderDetailShipperPage";
 
 export const router = createBrowserRouter([
   {
@@ -224,6 +226,24 @@ export const router = createBrowserRouter([
     element: (
       <RoleBasedGuard accessibleRoles={["Shipper"]} status="Active">
         <HomeShipperPage />
+      </RoleBasedGuard>
+    ),
+    errorElement: <Error />,
+  },
+  {
+    path: "/order-list-shipper",
+    element: (
+      <RoleBasedGuard accessibleRoles={["Shipper"]} status="Active">
+        <OrderListShipperPage />
+      </RoleBasedGuard>
+    ),
+    errorElement: <Error />,
+  },
+  {
+    path: "/order-detail-shipper",
+    element: (
+      <RoleBasedGuard accessibleRoles={["Shipper"]} status="Active">
+        <OrderDetailShipperPage />
       </RoleBasedGuard>
     ),
     errorElement: <Error />,

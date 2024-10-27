@@ -83,10 +83,10 @@ export const GetAllOrderOfStorage = async (storageProvinceId, searchQuery, curre
     }
 };
 
-export const GetAllOrderOfShipper = async (storageProvinceId, searchQuery, currentPage, rowsPerPage) => {
+export const GetAllOrderOfShipper = async (shipperId, searchQuery, currentPage, rowsPerPage) => {
     try {
         const skip = (currentPage - 1) * rowsPerPage;
-        var url = `${baseUrl}/odata/all-storage-history-order?storageProvinceId=${storageProvinceId}&$top=${rowsPerPage}&$skip=${skip}&$count=true&$orderby=createdDate desc`;
+        var url = `${baseUrl}/odata/shipper?shipperId=${shipperId}&$top=${rowsPerPage}&$skip=${skip}&$count=true&$orderby=createdDate desc`;
         if(searchQuery != ''){
             url += `&$filter=contains(customerName,'${searchQuery}')`
         }
@@ -159,6 +159,24 @@ export const GetDeliveryOfOrder = async (orderId) => {
 export const AssignJapaneseShipper = async (data) => {
     try {
         const url = `${baseUrl}/odata/Japanese-shipper`;
+        const request = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+export const ConfirmArrived = async (data) => {
+    try {
+        const url = `${baseUrl}/odata/delivery`;
         const request = {
             method: "PUT",
             headers: {

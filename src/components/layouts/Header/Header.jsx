@@ -208,7 +208,8 @@ function Header() {
                     {(user?.roleName == "KoiFarmManager"
                         || user?.roleName == "Customer"
                         || user?.roleName == "Admin"
-                        || user?.roleName == "StorageManager")
+                        || user?.roleName == "StorageManager"
+                        || user?.roleName == "Shipper")
                         ? (
                             <>
                                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>

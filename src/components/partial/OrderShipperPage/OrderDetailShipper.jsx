@@ -1,52 +1,24 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Select,
-  MenuItem,
-  Avatar,
-} from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
+import { Button, CircularProgress } from "@mui/material";
 import useAuth from "../../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import {
-  AssignJapaneseShipper,
-  AssignVietnameseShipper,
+  ConfirmArrived,
   GetDeliveryOfOrder,
   GetOrderDetail,
 } from "../../../api/OrderApi";
-import styles from "./order-detail-storage-manager.module.scss";
+import styles from "./order-detail-shipper.module.scss";
 import dayjs from "dayjs";
-import { GetAllShipperOfStorage } from "../../../api/ShipperApi";
 import CircleIcon from "@mui/icons-material/Circle";
-import { AssignFlight, GetFlightByStorageProvinceId } from "../../../api/FlightApi";
 
-function OrderDetailStorageManager() {
+function OrderDetailShipper() {
   const [isLoading, setIsLoading] = useState(false);
   const [orderDetail, setOrderDetail] = useState(null);
   const [orderDeliveryList, setOrderDeliveryList] = useState([]);
-  const [openDialogShipper, setOpenDialogShipper] = useState(false);
-  const [openDialogFlight, setOpenDialogFlight] = useState(false);
-  const [shippers, setShippers] = useState([]);
-  const [flightList, setFlightList] = useState([]);
-  const [selectedShipper, setSelectedShipper] = useState("");
-  const [selectedFlight, setSelectedFlight] = useState("");
   const { user } = useAuth();
   const location = useLocation();
   const { orderId } = location.state || {};
-
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
 
   const formatPriceVND = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -79,109 +51,103 @@ function OrderDetailStorageManager() {
     }
   };
 
-  const fetchShippers = async () => {
-    const response = await GetAllShipperOfStorage(
-      user.storageProvinceId,
-      "",
-      1,
-      100
-    );
-    if (response.ok) {
-      const responseData = await response.json();
-      setShippers(responseData.value);
-    } else if (response.status === 404) {
-      setShippers([]);
-    } else {
-      console.log("Error when fetch get all shipper of storage");
-    }
-  };
-
-  const fetchGetAllFlightByStorageProvinceId = async () => {
-    const response = await GetFlightByStorageProvinceId(user.storageProvinceId, orderDetail.customerProvinceId)
-    if (response.ok) {
-      const responseData = await response.json();
-      setFlightList(responseData.result);
-    } else {
-      console.log("Error when fetch get flight");
-    }
-  };
-
   useEffect(() => {
     if (orderId) {
       setIsLoading(true);
       fetchGetOrderDetail();
       fetchGetDeliveryOfOrder();
-      fetchShippers();
       setIsLoading(false);
     }
   }, [orderId]);
 
-  const handleAssignShipper = async () => {
-    if (selectedShipper) {
-      const data = {
-        orderId: orderId,
-        shipperId: selectedShipper,
-      };
-      setIsLoading(true);
-      if (user.country === "Japan") {
-        const response = await AssignJapaneseShipper(data);
-        const responseData = await response.json();
-        if (response.ok) {
-          toast.success("Assign shipper successfully");
-          fetchGetOrderDetail();
-          fetchGetDeliveryOfOrder();
-          fetchShippers();
-          setOpenDialogShipper(false);
-        } else {
-          toast.error(responseData.message);
-        }
-      } else if (user.country === "Vietnam") {
-        const response = await AssignVietnameseShipper(data);
-        const responseData = await response.json();
-        if (response.ok) {
-          toast.success("Assign shipper successfully");
-          fetchGetOrderDetail();
-          fetchGetDeliveryOfOrder();
-          fetchShippers();
-          setOpenDialogShipper(false);
-        } else {
-          toast.error(responseData.message);
-        }
-      }
-
-      setIsLoading(false);
+  const handleConfirmArrivingStorage = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
     } else {
-      toast.error("Please select a shipper");
+      toast.error(responseData.message);
     }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
   };
 
-  const handleOpenDialogFlight = async () => {
-    fetchGetAllFlightByStorageProvinceId();
-    setOpenDialogFlight(true);
-  }
-
-  const handleAssignFlight = async () => {
-    if (selectedFlight) {
-      const data = {
-        orderId: orderId,
-        flightId: selectedFlight,
-      };
-      setIsLoading(true);
-      const response = await AssignFlight(data);
-      const responseData = await response.json();
-      if (response.ok) {
-        toast.success("Assign flight successfully");
-        fetchGetOrderDetail();
-        fetchGetDeliveryOfOrder();
-        fetchShippers();
-        setOpenDialogFlight(false);
-      } else {
-        toast.error(responseData.message);
-      }
-      setIsLoading(false);
+  const handleConfirmArrivingJapanAirport = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
     } else {
-      toast.error("Please select a flight");
+      toast.error(responseData.message);
     }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
+  };
+
+  const handleConfirmArrivingVietnamAirport = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
+    } else {
+      toast.error(responseData.message);
+    }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
+  };
+
+  const handleConfirmArrivingVietnamStorage = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
+    } else {
+      toast.error(responseData.message);
+    }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
+  };
+
+  const handleConfirmArrivingCustomer= async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
+    } else {
+      toast.error(responseData.message);
+    }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
   };
 
   if (isLoading || !orderId) {
@@ -310,14 +276,14 @@ function OrderDetailStorageManager() {
             <div className={styles.footerItem}>
               <span className={styles.label}>Japanese Shipper:</span>
               <span className={styles.value}>
-                {orderDetail.japaneseShipper ?? "Not assign"}
+                {orderDetail.japaneseShipper ?? ""}
               </span>
             </div>
 
             <div className={styles.footerItem}>
               <span className={styles.label}>Vietnamese Shipper:</span>
               <span className={styles.value}>
-                {orderDetail.vietnameseShipper ?? "Not assign"}
+                {orderDetail.vietnameseShipper ?? ""}
               </span>
             </div>
 
@@ -382,152 +348,97 @@ function OrderDetailStorageManager() {
               </span>
             </div>
 
-            {orderDetail.status === "Packaged" && orderDetail.flightId !== null && user.country == "Japan" && (
-              <div>
-                <Button
-                  style={{
-                    backgroundColor: "#C71125",
-                    color: "white",
-                    marginTop: "10px",
-                    padding: "10px 30px",
-                  }}
-                  onClick={() => setOpenDialogShipper(true)}
-                >
-                  Assign Shipper
-                </Button>
-              </div>
-            )}
+            {orderDetail.status === "To Ship" &&
+              user.country ==
+              "Japan" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingStorage()}
+                  >
+                    Confirm Arriving Storage
+                  </Button>
+                </div>
+              )}
 
-            {orderDetail.status === "Packaged" && user.country == "Japan" && (
-              <div>
-                <Button
-                  style={{
-                    backgroundColor: "#C71125",
-                    color: "white",
-                    marginTop: "10px",
-                    padding: "10px 30px",
-                  }}
-                  onClick={() => handleOpenDialogFlight()}
-                >
-                  Assign Flight
-                </Button>
-              </div>
-            )}
+            {orderDetail.status === "Arrive Japan Storage" &&
+              user.country == "Japan" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingJapanAirport()}
+                  >
+                    Confirm Arriving Airport
+                  </Button>
+                </div>
+              )}
 
-            {orderDetail.status === "Arrive Japan Airport" && user.country == "Vietnam" && (
-              <div>
-                <Button
-                  style={{
-                    backgroundColor: "#C71125",
-                    color: "white",
-                    marginTop: "10px",
-                    padding: "10px 30px",
-                  }}
-                  onClick={() => setOpenDialogShipper(true)}
-                >
-                  Assign Shipper
-                </Button>
-              </div>
-            )}
+
+            {orderDetail.status === "Arrive Japan Airport" &&
+              user.country == "Vietnam" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingVietnamAirport()}
+                  >
+                    Confirm Arriving Vietnamese Airport
+                  </Button>
+                </div>
+              )}
+
+            {orderDetail.status === "Arrive Vietnam Airport" &&
+              user.country == "Vietnam" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingVietnamStorage()}
+                  >
+                    Confirm Arriving Vietnamese Storage
+                  </Button>
+                </div>
+              )}
+
+            {orderDetail.status === "Arrive Vietnam Storage" &&
+              user.country == "Vietnam" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingCustomer()}
+                  >
+                    Confirm Arriving Customer
+                  </Button>
+                </div>
+              )}
           </div>
         </div>
       )}
-
-      {/* Dialog cho việc chọn shipper */}
-      <Dialog open={openDialogShipper} onClose={() => setOpenDialogShipper(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Assign Shipper</DialogTitle>
-        <DialogContent style={{ width: "100%" }}>
-          <div>
-            <Controller
-              name="shipper"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  value={selectedShipper}
-                  onChange={(e) => setSelectedShipper(e.target.value)}
-                  fullWidth
-                >
-                  {shippers &&
-                    shippers.map((shipper) => (
-                      <MenuItem key={shipper.UserId} value={shipper.UserId}>
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          <img
-                            src={shipper.AvatarLink}
-                            alt={shipper.FullName}
-                            style={{
-                              marginRight: "10px",
-                              width: "70px",
-                              height: "60px",
-                            }}
-                          />
-                          {shipper.FullName}
-                        </div>
-                      </MenuItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialogShipper(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAssignShipper}
-            style={{ backgroundColor: "#C71125", color: "white" }}
-          >
-            Assign
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Dialog cho việc chọn flight */}
-      <Dialog open={openDialogFlight} onClose={() => setOpenDialogFlight(false)} maxWidth="lg" fullWidth>
-        <DialogTitle>Assign Flight</DialogTitle>
-        <DialogContent style={{ width: "100%" }}>
-          <div>
-            <Controller
-              name="flight"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  value={selectedFlight}
-                  onChange={(e) => setSelectedFlight(e.target.value)}
-                  fullWidth
-                >
-                  {flightList &&
-                    flightList.map((flight) => (
-                      <MenuItem key={flight.flightId} value={flight.flightId}>
-                        <div style={{ display: "flex", gap: '10px' }}>
-                          <strong>Flight Code:</strong> {flight.flightCode}
-                          <strong>Airline:</strong> {flight.airline}
-                          <strong>Departure Date:</strong> {dayjs(flight.departureDate).format('DD-MM-YYYY HH:mm')}
-                          <strong>Arrival Date:</strong> {dayjs(flight.arrivalDate).format('DD-MM-YYYY HH:mm')}
-                        </div>
-                      </MenuItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialogFlight(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAssignFlight}
-            style={{ backgroundColor: "#C71125", color: "white" }}
-          >
-            Assign
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 }
 
-export default OrderDetailStorageManager;
+export default OrderDetailShipper;

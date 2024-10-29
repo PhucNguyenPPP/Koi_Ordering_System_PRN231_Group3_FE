@@ -66,7 +66,7 @@ const KoiManagement = () => {
             setTotalPage(Math.ceil(responseData['@odata.count'] / rowsPerPage))
         } else if (response.status === 404) {
             setKoiList([]);
-            setCurrentPage(0);
+            setCurrentPage(1);
             setTotalPage(0);
         }
     };
@@ -131,6 +131,7 @@ const KoiManagement = () => {
             koiPrice: selectedKoi.Price,
             koiDescription: selectedKoi.Description,
             koiDateOfBirth: selectedKoi.Dob.split('T')[0],
+            weight: selectedKoi.Weight
         });
         setSelectedBreedIds(selectedKoi.BreedId);
         setOpenModalCreateKoi(true);
@@ -177,6 +178,7 @@ const KoiManagement = () => {
             koiPrice: '',
             koiDescription: '',
             koiDateOfBirth: '',
+            weight: '',
         });
     };
 
@@ -302,7 +304,7 @@ const KoiManagement = () => {
                                 </StyledTableRow>
                             )) : (
                                 <StyledTableRow>
-                                    <StyledTableCell colSpan={4} align="center">
+                                    <StyledTableCell colSpan={10} align="center">
                                         No koi found.
                                     </StyledTableCell>
                                 </StyledTableRow>
@@ -427,6 +429,31 @@ const KoiManagement = () => {
                                             type="number"
                                             error={!!errors.koiPrice}
                                             helperText={errors.koiPrice?.message}
+                                        />
+                                    )}
+                                />
+
+                                <Controller
+                                    name="weight"
+                                    control={controlCreateKoi}
+                                    defaultValue=""
+                                    rules={{
+                                        required: 'Please input weight',
+                                        min: {
+                                            value: 0.1,
+                                            message: "Weight must be at least 0.1 kg"
+                                        }
+                                    }}
+                                    render={({ field }) => (
+                                        <TextField
+                                            {...field}
+                                            label="Weight (kg)"
+                                            variant="outlined"
+                                            fullWidth
+                                            margin="normal"
+                                            type="number"
+                                            error={!!errors.weight}
+                                            helperText={errors.weight?.message}
                                         />
                                     )}
                                 />

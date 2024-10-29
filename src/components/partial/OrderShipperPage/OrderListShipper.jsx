@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styles from "./order-list-farm.module.scss";
+import styles from "./order-list-shipper.module.scss";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -21,8 +21,8 @@ import {
 import { MoreHorizontalIcon } from "lucide-react";
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
-import { GetAllFarmHistoryOrder } from "../../../api/OrderApi";
 import dayjs from "dayjs";
+import { GetAllOrderOfShipper } from "../../../api/OrderApi";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -40,7 +40,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const OrderListFarm = () => {
+const OrderListShipper = () => {
   const [orderList, setOrderList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
@@ -52,9 +52,9 @@ const OrderListFarm = () => {
   const [totalPage, setTotalPage] = useState(0);
   const navigate = useNavigate();
 
-  const fetchAllOrderOfFarm = async () => {
-    const response = await GetAllFarmHistoryOrder(
-      user.farmId,
+  const fetchAllOrderOfShipper = async () => {
+    const response = await GetAllOrderOfShipper(
+      user.userId,
       searchQuery,
       currentPage,
       rowsPerPage
@@ -64,20 +64,20 @@ const OrderListFarm = () => {
       setOrderList(responseData.value);
       setTotalPage(Math.ceil(responseData["@odata.count"] / rowsPerPage));
     } else if (response.status === 404) {
+      setOrderList([]);
       setCurrentPage(1);
       setTotalPage(0);
-      setOrderList([]);
     } else {
       setCurrentPage(1);
       setTotalPage(0);
-      console.log("Error when fetch get all farm history order");
+      console.log("Error when fetch get all  order of shipper");
     }
   };
 
   useEffect(() => {
     if (user) {
       setIsLoading(true);
-      fetchAllOrderOfFarm();
+      fetchAllOrderOfShipper();
       setIsLoading(false);
     }
   }, [user, searchQuery, currentPage]);
@@ -109,7 +109,7 @@ const OrderListFarm = () => {
 
   const handleDetail = () => {
     const orderId = selectedOrder.OrderId;
-    navigate("/order-detail-farm", { state: { orderId } });
+    navigate("/order-detail-shipper", { state: { orderId } });
     handleMenuClose();
   };
 
@@ -154,6 +154,11 @@ const OrderListFarm = () => {
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
                 >
+                  Farm
+                </StyledTableCell>
+                <StyledTableCell
+                  style={{ fontWeight: "bold", fontSize: "20px" }}
+                >
                   Created Date
                 </StyledTableCell>
                 <StyledTableCell
@@ -183,6 +188,7 @@ const OrderListFarm = () => {
                       <p className="font-semibold">{order.OrderNumber}</p>
                     </StyledTableCell>
                     <StyledTableCell>{order.CustomerName}</StyledTableCell>
+                    <StyledTableCell>{order.FarmName}</StyledTableCell>
                     <StyledTableCell>
                       {formatDate(order.CreatedDate)}
                     </StyledTableCell>
@@ -232,4 +238,4 @@ const OrderListFarm = () => {
   );
 };
 
-export default OrderListFarm;
+export default OrderListShipper;

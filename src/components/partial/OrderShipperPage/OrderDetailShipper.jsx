@@ -96,6 +96,60 @@ function OrderDetailShipper() {
     setIsLoading(false);
   };
 
+  const handleConfirmArrivingVietnamAirport = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
+    } else {
+      toast.error(responseData.message);
+    }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
+  };
+
+  const handleConfirmArrivingVietnamStorage = async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
+    } else {
+      toast.error(responseData.message);
+    }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
+  };
+
+  const handleConfirmArrivingCustomer= async () => {
+    const data = {
+      orderId: orderId,
+      shipperId: user.userId,
+    };
+    setIsLoading(true);
+    const response = await ConfirmArrived(data);
+    const responseData = await response.json();
+    if (response.ok) {
+      toast.success("Confirm successfully");
+    } else {
+      toast.error(responseData.message);
+    }
+    fetchGetOrderDetail();
+    fetchGetDeliveryOfOrder();
+    setIsLoading(false);
+  };
+
   if (isLoading || !orderId) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-gray-200 z-50">
@@ -234,6 +288,48 @@ function OrderDetailShipper() {
             </div>
 
             <div className={styles.footerItem}>
+              <span className={styles.label}>Flight Code:</span>
+              <span className={styles.value}>
+                {orderDetail.flightCode ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Airline:</span>
+              <span className={styles.value}>
+                {orderDetail.airline ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Departure Date:</span>
+              <span className={styles.value}>
+                {orderDetail.departureDate == null ? "Not assign" : dayjs(orderDetail.departureDate).format('DD-MM-YYYY HH:mm')}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Arrival Date:</span>
+              <span className={styles.value}>
+                {orderDetail.arrivalDate == null ? "Not assign" : dayjs(orderDetail.arrivalDate).format('DD-MM-YYYY HH:mm')}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Departure Airport:</span>
+              <span className={styles.value}>
+                {orderDetail.departureAirport ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Arrival  Airport:</span>
+              <span className={styles.value}>
+                {orderDetail.arrivalAirport ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
               <span className={styles.label}>Shipping Fee:</span>
               <span className={styles.value}>
                 {formatPriceVND(orderDetail.shippingFee)}
@@ -254,21 +350,21 @@ function OrderDetailShipper() {
 
             {orderDetail.status === "To Ship" &&
               user.country ==
-                "Japan"(
-                  <div>
-                    <Button
-                      style={{
-                        backgroundColor: "#C71125",
-                        color: "white",
-                        marginTop: "10px",
-                        padding: "10px 30px",
-                      }}
-                      onClick={() => handleConfirmArrivingStorage()}
-                    >
-                      Confirm Arriving Storage
-                    </Button>
-                  </div>
-                )}
+              "Japan" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingStorage()}
+                  >
+                    Confirm Arriving Storage
+                  </Button>
+                </div>
+              )}
 
             {orderDetail.status === "Arrive Japan Storage" &&
               user.country == "Japan" && (
@@ -283,6 +379,58 @@ function OrderDetailShipper() {
                     onClick={() => handleConfirmArrivingJapanAirport()}
                   >
                     Confirm Arriving Airport
+                  </Button>
+                </div>
+              )}
+
+
+            {orderDetail.status === "Arrive Japan Airport" &&
+              user.country == "Vietnam" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingVietnamAirport()}
+                  >
+                    Confirm Arriving Vietnamese Airport
+                  </Button>
+                </div>
+              )}
+
+            {orderDetail.status === "Arrive Vietnam Airport" &&
+              user.country == "Vietnam" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingVietnamStorage()}
+                  >
+                    Confirm Arriving Vietnamese Storage
+                  </Button>
+                </div>
+              )}
+
+            {orderDetail.status === "Arrive Vietnam Storage" &&
+              user.country == "Vietnam" && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#C71125",
+                      color: "white",
+                      marginTop: "10px",
+                      padding: "10px 30px",
+                    }}
+                    onClick={() => handleConfirmArrivingCustomer()}
+                  >
+                    Confirm Arriving Customer
                   </Button>
                 </div>
               )}

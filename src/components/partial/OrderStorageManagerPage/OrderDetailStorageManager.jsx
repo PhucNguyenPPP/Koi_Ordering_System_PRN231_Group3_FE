@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import {
   AssignJapaneseShipper,
+  AssignVietnameseShipper,
   GetDeliveryOfOrder,
   GetOrderDetail,
 } from "../../../api/OrderApi";
@@ -24,15 +25,18 @@ import styles from "./order-detail-storage-manager.module.scss";
 import dayjs from "dayjs";
 import { GetAllShipperOfStorage } from "../../../api/ShipperApi";
 import CircleIcon from "@mui/icons-material/Circle";
+import { AssignFlight, GetFlightByStorageProvinceId } from "../../../api/FlightApi";
 
 function OrderDetailStorageManager() {
   const [isLoading, setIsLoading] = useState(false);
   const [orderDetail, setOrderDetail] = useState(null);
   const [orderDeliveryList, setOrderDeliveryList] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialogShipper, setOpenDialogShipper] = useState(false);
+  const [openDialogFlight, setOpenDialogFlight] = useState(false);
   const [shippers, setShippers] = useState([]);
+  const [flightList, setFlightList] = useState([]);
   const [selectedShipper, setSelectedShipper] = useState("");
-
+  const [selectedFlight, setSelectedFlight] = useState("");
   const { user } = useAuth();
   const location = useLocation();
   const { orderId } = location.state || {};
@@ -92,6 +96,16 @@ function OrderDetailStorageManager() {
     }
   };
 
+  const fetchGetAllFlightByStorageProvinceId = async () => {
+    const response = await GetFlightByStorageProvinceId(user.storageProvinceId, orderDetail.customerProvinceId)
+    if (response.ok) {
+      const responseData = await response.json();
+      setFlightList(responseData.result);
+    } else {
+      console.log("Error when fetch get flight");
+    }
+  };
+
   useEffect(() => {
     if (orderId) {
       setIsLoading(true);
@@ -109,20 +123,64 @@ function OrderDetailStorageManager() {
         shipperId: selectedShipper,
       };
       setIsLoading(true);
-      const response = await AssignJapaneseShipper(data);
+      if (user.country === "Japan") {
+        const response = await AssignJapaneseShipper(data);
+        const responseData = await response.json();
+        if (response.ok) {
+          toast.success("Assign shipper successfully");
+          fetchGetOrderDetail();
+          fetchGetDeliveryOfOrder();
+          fetchShippers();
+          setOpenDialogShipper(false);
+        } else {
+          toast.error(responseData.message);
+        }
+      } else if (user.country === "Vietnam") {
+        const response = await AssignVietnameseShipper(data);
+        const responseData = await response.json();
+        if (response.ok) {
+          toast.success("Assign shipper successfully");
+          fetchGetOrderDetail();
+          fetchGetDeliveryOfOrder();
+          fetchShippers();
+          setOpenDialogShipper(false);
+        } else {
+          toast.error(responseData.message);
+        }
+      }
+
+      setIsLoading(false);
+    } else {
+      toast.error("Please select a shipper");
+    }
+  };
+
+  const handleOpenDialogFlight = async () => {
+    fetchGetAllFlightByStorageProvinceId();
+    setOpenDialogFlight(true);
+  }
+
+  const handleAssignFlight = async () => {
+    if (selectedFlight) {
+      const data = {
+        orderId: orderId,
+        flightId: selectedFlight,
+      };
+      setIsLoading(true);
+      const response = await AssignFlight(data);
       const responseData = await response.json();
       if (response.ok) {
-        toast.success("Assign shiper successfully");
+        toast.success("Assign flight successfully");
         fetchGetOrderDetail();
         fetchGetDeliveryOfOrder();
         fetchShippers();
-        setOpenDialog(false);
+        setOpenDialogFlight(false);
       } else {
         toast.error(responseData.message);
       }
       setIsLoading(false);
     } else {
-      toast.error("Please select a shipper");
+      toast.error("Please select a flight");
     }
   };
 
@@ -252,14 +310,56 @@ function OrderDetailStorageManager() {
             <div className={styles.footerItem}>
               <span className={styles.label}>Japanese Shipper:</span>
               <span className={styles.value}>
-                {orderDetail.japaneseShipper ?? ""}
+                {orderDetail.japaneseShipper ?? "Not assign"}
               </span>
             </div>
 
             <div className={styles.footerItem}>
               <span className={styles.label}>Vietnamese Shipper:</span>
               <span className={styles.value}>
-                {orderDetail.vietnameseShipper ?? ""}
+                {orderDetail.vietnameseShipper ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Flight Code:</span>
+              <span className={styles.value}>
+                {orderDetail.flightCode ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Airline:</span>
+              <span className={styles.value}>
+                {orderDetail.airline ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Departure Date:</span>
+              <span className={styles.value}>
+                {orderDetail.departureDate == null ? "Not assign" : dayjs(orderDetail.departureDate).format('DD-MM-YYYY HH:mm')}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Arrival Date:</span>
+              <span className={styles.value}>
+                {orderDetail.arrivalDate == null ? "Not assign" : dayjs(orderDetail.arrivalDate).format('DD-MM-YYYY HH:mm')}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Departure Airport:</span>
+              <span className={styles.value}>
+                {orderDetail.departureAirport ?? "Not assign"}
+              </span>
+            </div>
+
+            <div className={styles.footerItem}>
+              <span className={styles.label}>Arrival  Airport:</span>
+              <span className={styles.value}>
+                {orderDetail.arrivalAirport ?? "Not assign"}
               </span>
             </div>
 
@@ -282,7 +382,7 @@ function OrderDetailStorageManager() {
               </span>
             </div>
 
-            {orderDetail.status === "To Ship" && (
+            {orderDetail.status === "Packaged" && orderDetail.flightId !== null && user.country == "Japan" && (
               <div>
                 <Button
                   style={{
@@ -291,7 +391,39 @@ function OrderDetailStorageManager() {
                     marginTop: "10px",
                     padding: "10px 30px",
                   }}
-                  onClick={() => setOpenDialog(true)} // Mở dialog
+                  onClick={() => setOpenDialogShipper(true)}
+                >
+                  Assign Shipper
+                </Button>
+              </div>
+            )}
+
+            {orderDetail.status === "Packaged" && user.country == "Japan" && (
+              <div>
+                <Button
+                  style={{
+                    backgroundColor: "#C71125",
+                    color: "white",
+                    marginTop: "10px",
+                    padding: "10px 30px",
+                  }}
+                  onClick={() => handleOpenDialogFlight()}
+                >
+                  Assign Flight
+                </Button>
+              </div>
+            )}
+
+            {orderDetail.status === "Arrive Japan Airport" && user.country == "Vietnam" && (
+              <div>
+                <Button
+                  style={{
+                    backgroundColor: "#C71125",
+                    color: "white",
+                    marginTop: "10px",
+                    padding: "10px 30px",
+                  }}
+                  onClick={() => setOpenDialogShipper(true)}
                 >
                   Assign Shipper
                 </Button>
@@ -302,9 +434,9 @@ function OrderDetailStorageManager() {
       )}
 
       {/* Dialog cho việc chọn shipper */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      <Dialog open={openDialogShipper} onClose={() => setOpenDialogShipper(false)} maxWidth="xs" fullWidth>
         <DialogTitle>Assign Shipper</DialogTitle>
-        <DialogContent style={{ width: "300px" }}>
+        <DialogContent style={{ width: "100%" }}>
           <div>
             <Controller
               name="shipper"
@@ -321,11 +453,11 @@ function OrderDetailStorageManager() {
                       <MenuItem key={shipper.UserId} value={shipper.UserId}>
                         <div style={{ display: "flex", alignItems: "center" }}>
                           <img
-                            src={shipper.AvatarLink} // Link hình ảnh của shipper
+                            src={shipper.AvatarLink}
                             alt={shipper.FullName}
                             style={{
                               marginRight: "10px",
-                              width: "80px",
+                              width: "70px",
                               height: "60px",
                             }}
                           />
@@ -339,11 +471,55 @@ function OrderDetailStorageManager() {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="secondary">
+          <Button onClick={() => setOpenDialogShipper(false)} color="secondary">
             Cancel
           </Button>
           <Button
             onClick={handleAssignShipper}
+            style={{ backgroundColor: "#C71125", color: "white" }}
+          >
+            Assign
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog cho việc chọn flight */}
+      <Dialog open={openDialogFlight} onClose={() => setOpenDialogFlight(false)} maxWidth="lg" fullWidth>
+        <DialogTitle>Assign Flight</DialogTitle>
+        <DialogContent style={{ width: "100%" }}>
+          <div>
+            <Controller
+              name="flight"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  value={selectedFlight}
+                  onChange={(e) => setSelectedFlight(e.target.value)}
+                  fullWidth
+                >
+                  {flightList &&
+                    flightList.map((flight) => (
+                      <MenuItem key={flight.flightId} value={flight.flightId}>
+                        <div style={{ display: "flex", gap: '10px' }}>
+                          <strong>Flight Code:</strong> {flight.flightCode}
+                          <strong>Airline:</strong> {flight.airline}
+                          <strong>Departure Date:</strong> {dayjs(flight.departureDate).format('DD-MM-YYYY HH:mm')}
+                          <strong>Arrival Date:</strong> {dayjs(flight.arrivalDate).format('DD-MM-YYYY HH:mm')}
+                        </div>
+                      </MenuItem>
+                    ))}
+                </Select>
+              )}
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialogFlight(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAssignFlight}
             style={{ backgroundColor: "#C71125", color: "white" }}
           >
             Assign

@@ -174,6 +174,24 @@ export const AssignJapaneseShipper = async (data) => {
     }
 };
 
+export const AssignVietnameseShipper = async (data) => {
+    try {
+        const url = `${baseUrl}/odata/Vietnamese-shipper`;
+        const request = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 export const ConfirmArrived = async (data) => {
     try {
         const url = `${baseUrl}/odata/delivery`;

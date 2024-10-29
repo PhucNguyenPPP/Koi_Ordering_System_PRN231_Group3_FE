@@ -65,10 +65,10 @@ const OrderListShipper = () => {
       setTotalPage(Math.ceil(responseData["@odata.count"] / rowsPerPage));
     } else if (response.status === 404) {
       setOrderList([]);
-      setCurrentPage(0);
+      setCurrentPage(1);
       setTotalPage(0);
     } else {
-      setCurrentPage(0);
+      setCurrentPage(1);
       setTotalPage(0);
       console.log("Error when fetch get all  order of shipper");
     }

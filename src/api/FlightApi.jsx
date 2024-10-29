@@ -61,3 +61,61 @@ export const UpdateFlight = async (data) => {
       throw err;
     });
 };
+
+export const DeleteFlight = async (flightId) => {
+  const url = `${baseUrl}/odata/${flightId}`;
+  const request = {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  return fetch(url, request)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+};
+
+export const GetFlightByStorageProvinceId = async (departureStorageProvinceId, arrivalStorageProvinceId) => {
+  const url = `${baseUrl}/odata/flights-by-provinceId?departureStorageProvinceId=${departureStorageProvinceId}&arrivalStorageProvinceId=${arrivalStorageProvinceId}`;
+  const request = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  return fetch(url, request)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+};
+
+export const AssignFlight = async (data) => {
+  const url = `${baseUrl}/odata/flight-of-order`;
+  const request = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data)
+  };
+
+  return fetch(url, request)
+    .then((response) => {
+      return response;
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+};

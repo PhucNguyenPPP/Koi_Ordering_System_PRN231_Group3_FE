@@ -51,6 +51,7 @@ import { GetAllBreed } from "../../../api/BreedApi";
 import { useNavigate } from "react-router-dom";
 import {
   CreateFlight,
+  DeleteFlight,
   GetAllFlight,
   UpdateFlight,
 } from "../../../api/FlightApi";
@@ -104,7 +105,7 @@ const FlightManagement = () => {
       setTotalPage(Math.ceil(responseData["@odata.count"] / rowsPerPage));
     } else {
       setFlightList([]);
-      setCurrentPage(0);
+      setCurrentPage(1);
       setTotalPage(0);
     }
   };
@@ -192,15 +193,15 @@ const FlightManagement = () => {
 
   const handleFetchDelete = async () => {
     setIsLoading(true);
-    // const response = await DeleteKoi(selectedKoi.KoiId);
-    // if (response.ok) {
-    //   fetchAllKoiListOfFarm();
-    //   handleCloseDeleteConfirmation();
-    //   toast.success("Delete Koi successfully");
-    // } else {
-    //   const responseData = await response.json();
-    //   toast.error("Delete Koi failed: " + responseData.message);
-    // }
+    const response = await DeleteFlight(selectedFlight.FlightId);
+    if (response.ok) {
+      fetchAllFlight();
+      handleCloseDeleteConfirmation();
+      toast.success("Delete Flight successfully");
+    } else {
+      const responseData = await response.json();
+      toast.error("Delete Flight failed: " + responseData.message);
+    }
     setIsLoading(false);
   };
 
@@ -600,7 +601,7 @@ const FlightManagement = () => {
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this Koi?
+            Are you sure you want to delete this flight?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

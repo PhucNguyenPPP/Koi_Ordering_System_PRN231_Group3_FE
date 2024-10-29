@@ -64,11 +64,11 @@ const OrderListFarm = () => {
       setOrderList(responseData.value);
       setTotalPage(Math.ceil(responseData["@odata.count"] / rowsPerPage));
     } else if (response.status === 404) {
-      setCurrentPage(0);
+      setCurrentPage(1);
       setTotalPage(0);
       setOrderList([]);
     } else {
-      setCurrentPage(0);
+      setCurrentPage(1);
       setTotalPage(0);
       console.log("Error when fetch get all farm history order");
     }

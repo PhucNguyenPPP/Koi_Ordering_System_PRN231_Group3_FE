@@ -61,6 +61,7 @@ export const CreateKoi = async (data, farmId) => {
     formData.append('Description', data.koiDescription);
     formData.append('Dob', data.koiDateOfBirth);
     formData.append('Gender', data.gender);
+    formData.append('Weight', data.weight);
     data.breedList.forEach(breedId => {
         formData.append('BreedId', breedId);
     });
@@ -101,6 +102,7 @@ export const UpdateKoi = async (koiId, data) => {
     formData.append('Description', data.koiDescription);
     formData.append('Dob', data.koiDateOfBirth);
     formData.append('Gender', data.gender);
+    formData.append('Weight', data.weight);
     data.breedList.forEach(breedId => {
         formData.append('BreedId', breedId);
     });

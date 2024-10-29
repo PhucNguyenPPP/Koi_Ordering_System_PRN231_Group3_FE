@@ -61,6 +61,7 @@ function KoiDetailManagement() {
                     <p><strong>Breed:</strong> {koiDetail.breedName.join(', ')}</p>
                     <p><strong>Gender:</strong> {koiDetail.gender}</p>
                     <p><strong>Age:</strong> {koiDetail.age}</p>
+                    <p><strong>Weight:</strong> {koiDetail.weight} kg</p>
                     <p><strong>Certification: </strong>
                         <a
                             href={koiDetail.certificationLink}

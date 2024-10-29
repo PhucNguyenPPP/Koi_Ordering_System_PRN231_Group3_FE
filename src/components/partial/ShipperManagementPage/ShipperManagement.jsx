@@ -87,7 +87,7 @@ const ShipperManagement = () => {
       setTotalPage(Math.ceil(responseData["@odata.count"] / rowsPerPage));
     } else if (response.status === 404) {
       setShipperList([]);
-      setCurrentPage(0);
+      setCurrentPage(1);
       setTotalPage(0);
     } else {
       console.log("Error when fetch get all shipper of storage");

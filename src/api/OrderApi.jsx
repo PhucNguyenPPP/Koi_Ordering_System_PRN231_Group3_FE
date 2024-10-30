@@ -209,3 +209,21 @@ export const ConfirmArrived = async (data) => {
         console.log(err);
     }
 };
+
+
+export const ConfirmOrderCustomer = async (orderId) => {
+    try {
+        const url = `${baseUrl}/odata/completed/${orderId}`;
+        const request = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};

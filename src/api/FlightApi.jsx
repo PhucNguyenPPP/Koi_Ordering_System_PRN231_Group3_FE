@@ -13,6 +13,7 @@ export const GetAllFlight = async (searchQuery, currentPage, rowsPerPage) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
       },
     };
     const response = await fetch(url, request);
@@ -28,6 +29,7 @@ export const CreateFlight = async (data) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
     },
     body: JSON.stringify(data),
   };
@@ -48,6 +50,7 @@ export const UpdateFlight = async (data) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
     },
     body: JSON.stringify(data),
   };
@@ -68,6 +71,7 @@ export const DeleteFlight = async (flightId) => {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
     },
   };
 
@@ -87,6 +91,7 @@ export const GetFlightByStorageProvinceId = async (departureStorageProvinceId, a
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
     },
   };
 
@@ -106,6 +111,7 @@ export const AssignFlight = async (data) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
     },
     body: JSON.stringify(data)
   };

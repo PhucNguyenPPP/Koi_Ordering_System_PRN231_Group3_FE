@@ -4,6 +4,7 @@ import { TextField, Button, Typography, Box, InputLabel, FormControl, Input, Men
 import { RegisterCustomer } from '../../../api/AuthenApi';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 const SignUpCustomer = () => {
     const { handleSubmit, control, register, formState: { errors } } = useForm();
@@ -19,7 +20,8 @@ const SignUpCustomer = () => {
         return `${year}-${month}-${day}`;
     };
 
-    const maxDate = getTodayDate();
+
+    const maxDate = dayjs().subtract(18, 'year').format("YYYY-MM-DD");
     const onSubmit = async (data) => {
         setIsLoading(true)
         const response = await RegisterCustomer(data);
@@ -79,7 +81,7 @@ const SignUpCustomer = () => {
                     <Typography color='red' gutterBottom>
                         * {errorMessage}
                     </Typography>)}
-                <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <FormControl fullWidth margin="normal">
                         <InputLabel shrink>
                             Avatar
@@ -290,7 +292,7 @@ const SignUpCustomer = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ mt: 2, position: 'relative' }} 
+                        sx={{ mt: 2, position: 'relative' }}
                         disabled={isLoading}
                     >
                         {isLoading ? (

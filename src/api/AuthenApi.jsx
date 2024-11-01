@@ -153,6 +153,7 @@ export const RegisterShipper = (data, storageProvinceId) => {
         body: formData,
         headers: {
             'accept': '*/*',
+            "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
         },
     };
 

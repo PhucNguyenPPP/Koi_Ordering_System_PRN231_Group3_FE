@@ -16,8 +16,9 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import useAuth from '../../../hooks/useAuth';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Logout } from '../../../api/AuthenApi';
+import { useState } from 'react';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -180,6 +181,18 @@ function Header() {
         </Menu>
     );
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const location = useLocation();
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        if (location.pathname !== '/') {
+            navigate('/', { state: { searchQuery: searchQuery } });
+        } else {
+            navigate('/', { state: { searchQuery: searchQuery } });
+        }
+    };
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="fixed" sx={{ backgroundColor: '#C71125', height: '70px' }}>
@@ -198,10 +211,14 @@ function Header() {
                         <SearchIconWrapper>
                             <SearchIcon />
                         </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search koi name..."
-                            inputProps={{ 'aria-label': 'search' }}
-                        />
+                        <form onSubmit={handleSearch}>
+                            <StyledInputBase
+                                placeholder="Search koi name..."
+                                inputProps={{ 'aria-label': 'search' }}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </form>
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
 

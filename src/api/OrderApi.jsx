@@ -14,7 +14,10 @@ export const CreateOrder = async (data, customerId, kois) => {
         const url = `${baseUrl}/odata/order`;
         const request = {
             method: "POST",
-            body: formData
+            body: formData,
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+            }
         };
         const response = await fetch(url, request);
         return response;
@@ -31,6 +34,7 @@ export const GetAllCustomerHistoryOrder = async (customerId, currentPage, rowsPe
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
         };
         const response = await fetch(url, request);
@@ -52,6 +56,7 @@ export const GetAllFarmHistoryOrder = async (farmId, searchQuery, currentPage, r
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
         };
         const response = await fetch(url, request);
@@ -73,6 +78,7 @@ export const GetAllOrderOfStorage = async (storageProvinceId, searchQuery, curre
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
         };
         const response = await fetch(url, request);
@@ -94,6 +100,7 @@ export const GetAllOrderOfShipper = async (shipperId, searchQuery, currentPage, 
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
         };
         const response = await fetch(url, request);
@@ -111,6 +118,7 @@ export const GetOrderDetail = async (orderId) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
         };
         const response = await fetch(url, request);
@@ -128,6 +136,7 @@ export const PackOrder = async (data, orderId) => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
             body: JSON.stringify(data)
         };
@@ -146,6 +155,7 @@ export const GetDeliveryOfOrder = async (orderId) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
         };
         const response = await fetch(url, request);
@@ -163,6 +173,7 @@ export const AssignJapaneseShipper = async (data) => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
             body: JSON.stringify(data),
         };
@@ -181,6 +192,7 @@ export const AssignVietnameseShipper = async (data) => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
             body: JSON.stringify(data),
         };
@@ -199,8 +211,28 @@ export const ConfirmArrived = async (data) => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
             body: JSON.stringify(data),
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+
+export const ConfirmOrderCustomer = async (orderId) => {
+    try {
+        const url = `${baseUrl}/odata/completed/${orderId}`;
+        const request = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+            },
         };
         const response = await fetch(url, request);
         

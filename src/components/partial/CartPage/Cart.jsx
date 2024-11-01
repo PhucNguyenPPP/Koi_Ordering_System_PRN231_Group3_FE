@@ -135,6 +135,17 @@ const CartPage = () => {
     <div className={styles.cartPage}>
       <Paper className={styles.section} elevation={3}>
         <Box display="flex" alignItems="center" padding={1}>
+
+          <Typography
+            variant="h6"
+            style={{ flex: 1, textAlign: "center", color: "#C71125" , fontWeight: "bold" }}
+          >
+            Please select Kois from the same koi farm to check out.
+          </Typography>
+        </Box>
+      </Paper>
+      <Paper className={styles.section} elevation={3}>
+        <Box display="flex" alignItems="center" padding={1}>
           <Checkbox
             checked={checkedItems.length === cartList.length}
             onChange={(e) => {

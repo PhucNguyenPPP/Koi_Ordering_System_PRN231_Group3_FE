@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import HomeSlider from "./HomeSlider";
 import { GetAllKoi } from "../../../api/KoiApi";
 import { CircularProgress } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Home() {
     const [koiList, setKoiList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const { searchQuery } = location.state || {};
 
     useEffect(() => {
         const fetchAllKoiList = async () => {
             setIsLoading(true);
-            const response = await GetAllKoi();
+            const response = await GetAllKoi(searchQuery);
             const responseData = await response.json();
             if (response.ok) {
                 setKoiList(responseData.value);
@@ -25,7 +27,7 @@ function Home() {
         };
 
         fetchAllKoiList();
-    }, []);
+    }, [searchQuery]);
 
     const formatPriceVND = (price) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);

@@ -130,7 +130,7 @@ function KoiDetail() {
                         <button className={styles.addToCartButton} onClick={handleAddToCart}>
                             <AddShoppingCartIcon /> Add to Cart
                         </button>
-                        <button className={styles.buyNowButton}>Buy Now</button>
+                        {/* <button className={styles.buyNowButton}>Buy Now</button> */}
                     </div>
                 </div>
             </div>

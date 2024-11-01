@@ -52,7 +52,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const maxDate = dayjs(new Date()).format("YYYY-MM-DD");
+const maxDate = dayjs().subtract(18, 'year').format("YYYY-MM-DD");
 
 const ShipperManagement = () => {
   const [shipperList, setShipperList] = useState([]);
@@ -205,12 +205,12 @@ const ShipperManagement = () => {
                 >
                   Gender
                 </StyledTableCell>
-                <StyledTableCell
+                {/* <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
                   align="right"
                 >
                   Action
-                </StyledTableCell>
+                </StyledTableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -236,13 +236,13 @@ const ShipperManagement = () => {
                     <StyledTableCell>{shipper.Email}</StyledTableCell>
                     <StyledTableCell>{shipper.Address}</StyledTableCell>
                     <StyledTableCell>{shipper.Gender}</StyledTableCell>
-                    <StyledTableCell align="right">
+                    {/* <StyledTableCell align="right">
                       <IconButton
                         onClick={(event) => handleMenuClick(event, shipper)}
                       >
                         <MoreHorizontalIcon />
                       </IconButton>
-                    </StyledTableCell>
+                    </StyledTableCell> */}
                   </StyledTableRow>
                 ))
               ) : (

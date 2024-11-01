@@ -7,6 +7,7 @@ export const GetKoiFarmDetail = async (farmId) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
         };
         const response = await fetch(url, request);

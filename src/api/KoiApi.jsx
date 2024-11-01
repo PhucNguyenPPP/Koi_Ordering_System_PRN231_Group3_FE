@@ -1,12 +1,16 @@
 const baseUrl = import.meta.env.VITE_API_HOST;
 
-export const GetAllKoi = async () => {
+export const GetAllKoi = async (searchQuery) => {
     try {
-        const url = `${baseUrl}/odata/all-koi`;
+        var url = `${baseUrl}/odata/all-koi?`;
+        if(searchQuery && searchQuery !== "") {
+             url += `&$filter=contains(name,'${searchQuery}')`
+        }
         const request = {
             method: "GET",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             }
         };
         const response = await fetch(url, request);
@@ -22,7 +26,8 @@ export const GetKoiByKoiId = async (koiId) => {
         const request = {
             method: "GET",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             }
         };
         const response = await fetch(url, request);
@@ -42,7 +47,8 @@ export const GetAllKoiOfFarm = async (farmId, searchQuery, currentPage, rowsPerP
         const request = {
             method: "GET",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             }
         };
         const response = await fetch(url, request);
@@ -73,6 +79,7 @@ export const CreateKoi = async (data, farmId) => {
         body: formData,
         headers: {
             'accept': '*/*',
+            "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
         },
     };
 
@@ -113,6 +120,7 @@ export const UpdateKoi = async (koiId, data) => {
         body: formData,
         headers: {
             'accept': '*/*',
+            "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
         },
     };
 
@@ -132,7 +140,8 @@ export const DeleteKoi = async (koiId) => {
         const request = {
             method: "DELETE",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             }
         };
         const response = await fetch(url, request);

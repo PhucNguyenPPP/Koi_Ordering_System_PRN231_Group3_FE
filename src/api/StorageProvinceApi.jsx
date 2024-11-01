@@ -6,7 +6,8 @@ export const GetStorageProvinceJapan = async () => {
         const request = {
             method: "GET",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             }
         };
         const response = await fetch(url, request);
@@ -22,7 +23,8 @@ export const GetStorageProvinceVietNam = async () => {
         const request = {
             method: "GET",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             }
         };
         const response = await fetch(url, request);

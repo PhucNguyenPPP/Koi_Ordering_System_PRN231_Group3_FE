@@ -89,6 +89,7 @@ function OrderDetailFarm() {
     if (response.ok) {
       toast.success("Pack order successfully");
       fetchGetOrderDetail();
+      fetchGetDeliveryOfOrder();
     } else {
       toast.error("Pack order failed");
     }
@@ -264,8 +265,8 @@ function OrderDetailFarm() {
                 rules={{
                   required: "Please input length",
                   min: {
-                    value: 1,
-                    message: "Length must be at least 1",
+                    value: 20,
+                    message: "Length must be at least 20 cm",
                   },
                 }}
                 render={({ field }) => (
@@ -287,8 +288,8 @@ function OrderDetailFarm() {
                 rules={{
                   required: "Please input width",
                   min: {
-                    value: 1,
-                    message: "Width must be at least 1",
+                    value: 20,
+                    message: "Width must be at least 20 cm",
                   },
                 }}
                 render={({ field }) => (
@@ -318,8 +319,8 @@ function OrderDetailFarm() {
                 rules={{
                   required: "Please input height",
                   min: {
-                    value: 1,
-                    message: "Height must be at least 1",
+                    value: 20,
+                    message: "Height must be at least 20 cm",
                   },
                 }}
                 render={({ field }) => (
@@ -341,8 +342,8 @@ function OrderDetailFarm() {
                 rules={{
                   required: "Please input weight",
                   min: {
-                    value: 1,
-                    message: "Weight must be at least 1",
+                    value: 5,
+                    message: "Weight must be at least 5 kg",
                   },
                 }}
                 render={({ field }) => (

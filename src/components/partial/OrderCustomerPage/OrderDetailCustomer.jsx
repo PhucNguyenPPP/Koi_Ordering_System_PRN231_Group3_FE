@@ -7,6 +7,7 @@ import { ConfirmOrderCustomer, GetDeliveryOfOrder, GetOrderDetail } from "../../
 import styles from "./order-detail.module.scss";
 import dayjs from "dayjs";
 import CircleIcon from "@mui/icons-material/Circle";
+import { CreatePaymentUrl } from "../../../api/PaymentApi";
 
 function OrderDetailCustomer() {
   const [isLoading, setIsLoading] = useState(false);
@@ -56,7 +57,7 @@ function OrderDetailCustomer() {
     }
   }, [orderId]);
 
-  const handleConfirmOrderCustomer= async () => {
+  const handleConfirmOrderCustomer = async () => {
     setIsLoading(true);
     const response = await ConfirmOrderCustomer(orderId);
     if (response.ok) {
@@ -68,6 +69,23 @@ function OrderDetailCustomer() {
     fetchGetDeliveryOfOrder();
     setIsLoading(false);
   };
+
+  const handlePayment = async () => {
+    const fetchCreatePaymentUrl = async () => {
+      const response = await CreatePaymentUrl(orderId);
+      const responseDataCreateUrl = await response.json();
+      if (response.ok) {
+        setIsLoading(false);
+        window.location.href = responseDataCreateUrl.result;
+      } else {
+        toast.error("Create payment link failed");
+      }
+    };
+
+    setIsLoading(true);
+    fetchCreatePaymentUrl();
+    setIsLoading(false);
+  }
 
   if (isLoading || !orderId) {
     return (
@@ -177,21 +195,37 @@ function OrderDetailCustomer() {
               </span>
             </div>
 
+            {orderDetail.status === "Unpaid" && (
+              <div>
+                <Button
+                  style={{
+                    backgroundColor: "#C71125",
+                    color: "white",
+                    marginTop: "10px",
+                    padding: "5px 20px",
+                  }}
+                  onClick={() => handlePayment()}
+                >
+                  Paid
+                </Button>
+              </div>
+            )}
+
             {orderDetail.status === "To Receive" && (
-                <div>
-                  <Button
-                    style={{
-                      backgroundColor: "#C71125",
-                      color: "white",
-                      marginTop: "10px",
-                      padding: "10px 30px",
-                    }}
-                    onClick={() => handleConfirmOrderCustomer()}
-                  >
-                    Confirm Order
-                  </Button>
-                </div>
-              )}
+              <div>
+                <Button
+                  style={{
+                    backgroundColor: "#C71125",
+                    color: "white",
+                    marginTop: "10px",
+                    padding: "10px 30px",
+                  }}
+                  onClick={() => handleConfirmOrderCustomer()}
+                >
+                  Confirm Order
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}

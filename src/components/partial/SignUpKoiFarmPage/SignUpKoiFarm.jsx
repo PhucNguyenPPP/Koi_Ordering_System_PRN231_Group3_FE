@@ -5,6 +5,7 @@ import { RegisterCustomer, RegisterKoiFarm } from '../../../api/AuthenApi';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { GetStorageProvinceJapan } from '../../../api/StorageProvinceApi';
+import dayjs, { Dayjs } from 'dayjs';
 
 const SignUpKoiFarm = () => {
     const { handleSubmit, control, register, formState: { errors } } = useForm();
@@ -21,7 +22,8 @@ const SignUpKoiFarm = () => {
         return `${year}-${month}-${day}`;
     };
 
-    const maxDate = getTodayDate();
+
+    const maxDate = dayjs().subtract(18, 'year').format("YYYY-MM-DD");
     const onSubmit = async (data) => {
         const response = await RegisterKoiFarm(data);
         if (response.ok) {
@@ -105,7 +107,7 @@ const SignUpKoiFarm = () => {
                     <Typography color='red' gutterBottom>
                         * {errorMessage}
                     </Typography>)}
-                <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <FormControl fullWidth margin="normal">
                         <InputLabel shrink>
                             Avatar

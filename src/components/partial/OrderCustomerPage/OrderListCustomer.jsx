@@ -58,13 +58,26 @@ function OrderListCustomer() {
         );
     }
 
+    if (orders && orders.length == 0) {
+        return (
+            <div className={styles.backgroundContainer}>
+                <div className={styles.sectionItemContainer}>
+                    <p className="text-center text-red-700 text-3xl p-5 font-semibold">
+                        No Order Found
+                    </p>
+                </div>
+            </div>
+        )
+
+    }
+
     return (
         <div className={styles.backgroundContainer}>
             {orders && orders.map((order) => (
                 <div key={order.OrderId} className={styles.sectionItemContainer}>
                     {/* Header của item */}
                     <div className={styles.itemHeader}>
-                        <div className={styles.shopName}>{order.FarmName}</div>
+                        <div className={styles.shopName}>{order.OrderNumber}</div>
                         <div className={styles.orderStatus}>{order.Status}</div>
                     </div>
 
@@ -78,7 +91,13 @@ function OrderListCustomer() {
                                     alt={koi.Name}
                                 />
                                 <div className={styles.fishDetails}>
-                                    <div className={styles.fishName}>{koi.Name}</div>
+                                    <div>
+                                        <div className={styles.fishName}>{koi.Name}</div>
+                                        <div className={styles.fishName}>Farm: <span className='font-normal'>{order.FarmName}</span></div>
+                                        <div className={styles.fishName}>Breed: <span className='font-normal'>{koi.BreedName.join(', ')}</span></div>
+                                        <div className={styles.fishName}>Age: <span className='font-normal'>{koi.Age}</span></div>
+                                        <div className={styles.fishName}>Weight: <span className='font-normal'>{koi.Weight} kg</span></div>
+                                    </div>
                                     <div className={styles.fishPrice}>{formatPriceVND(koi.Price)}</div>
                                 </div>
                             </div>

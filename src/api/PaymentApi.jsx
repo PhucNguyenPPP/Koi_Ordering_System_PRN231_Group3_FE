@@ -7,6 +7,7 @@ export const CreatePaymentUrl = async (orderId) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             }
         };
         const response = await fetch(url, request);
@@ -23,6 +24,7 @@ export const HandlePaymentResponse = async (data) => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
             },
             body: JSON.stringify(data)
         };

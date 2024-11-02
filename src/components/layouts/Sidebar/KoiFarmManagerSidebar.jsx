@@ -10,7 +10,7 @@ export default function KoiFarmManagerSideBar() {
             <SidebarItem icon={<HomeOutlinedIcon/>} text={"Home"} href={"/home-koi-farm-manager"}/>
             <SidebarItem icon={<SetMealIcon /> } text={"Koi"} href={"/koi-management"}/>
             <SidebarItem icon={<AssignmentOutlinedIcon /> } text={"Order"} href={"/order-list-farm"}/>
-            <SidebarItem icon={<AssignmentOutlinedIcon /> } text={"Policy"} href={"/policy-management"}/>
+            <SidebarItem icon={<PolicyOutlinedIcon /> } text={"Policy"} href={"/policy-management"}/>
         </Sidebar>
     );
 }

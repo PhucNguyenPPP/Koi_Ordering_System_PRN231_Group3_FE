@@ -27,6 +27,7 @@ import FlightMagementPage from "../pages/FlightManagementPage/FlightManagementPa
 import HomeShipperPage from "../pages/HomePage/HomeShipperPage";
 import OrderListShipperPage from "../pages/OrderShipperPage/OrderListShipperPage";
 import OrderDetailShipperPage from "../pages/OrderShipperPage/OrderDetailShipperPage";
+import PolicyManagementPage from "../pages/PolicyManagementPage/PolicyManagementPage";
 
 export const router = createBrowserRouter([
   {
@@ -216,7 +217,7 @@ export const router = createBrowserRouter([
     path: "/policy-management",
     element: (
       <RoleBasedGuard accessibleRoles={["KoiFarmManager"]} status="Active">
-        <FlightMagementPage />
+        <PolicyManagementPage />
       </RoleBasedGuard>
     ),
     errorElement: <Error />,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styles from "./flight-management.module.scss";
+import styles from "./policy-management.module.scss";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -118,9 +118,9 @@ const PolicyManagement = () => {
     }).format(price);
   };
 
-  const handleMenuClick = (event, flight) => {
+  const handleMenuClick = (event, policy) => {
     setAnchorEl(event.currentTarget);
-    setSelectedFlight(flight);
+    setSelectedPolicy(policy);
   };
 
   const handleMenuClose = () => {
@@ -135,14 +135,13 @@ const PolicyManagement = () => {
   const handleEdit = () => {
     setIsEditing(true);
     reset({
-      flightId: selectedFlight.FlightId,
-      airline: selectedFlight.Airline,
-      departureDate: selectedFlight.DepartureDate,
-      arrivalDate: selectedFlight.ArrivalDate,
-      departureAirportId: selectedFlight.DepartureAirportId,
-      arrivalAirportId: selectedFlight.ArrivalAirportId,
+      policyId: selectedPolicy.PolicyId,
+      policyName: selectedPolicy.PolicyName,
+      description: selectedPolicy.Description,
+      percentageRefund: selectedPolicy.PercentageRefund,
+      isBackFarm: true
     });
-    setOpenModalCreateFlight(true);
+    setOpenModalCreatePolicy(true);
     handleMenuClose();
   };
 
@@ -152,7 +151,7 @@ const PolicyManagement = () => {
   };
 
   const handleCreate = () => {
-    setOpenModalCreateFlight(true);
+    setOpenModalCreatePolicy(true);
   };
 
   const handleCloseDeleteConfirmation = () => {
@@ -174,17 +173,16 @@ const PolicyManagement = () => {
     setIsLoading(false);
   };
 
-  const handleCloseModalCreateFlight = () => {
-    setOpenModalCreateFlight(false);
+  const handleCloseModalCreatePolicy = () => {
+    setOpenModalCreatePolicy(false);
     setIsEditing(false);
-    setSelectedFlight(null);
+    setSelectedPolicy(null);
     reset({
-      flightId: "",
-      airline: "",
-      departureDate: "",
-      arrivalDate: "",
-      departureAirportId: "",
-      arrivalAirportId: "",
+      policyId: "",
+      policyName: "",
+      description:"",
+      percentageRefund: "",
+      isBackFarm: true
     });
   };
 
@@ -233,8 +231,6 @@ const PolicyManagement = () => {
     setCurrentPage(page);
   };
 
-  // const filteredKoiList = koiList.filter(koi => koi.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
   if (isLoading) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-gray-200 z-50">
@@ -248,7 +244,7 @@ const PolicyManagement = () => {
       <div className={styles.koiContentContainer}>
         <div className="flex justify-between items-center mb-4">
           <TextField
-            label="Search Koi"
+            label="Search policy name"
             variant="outlined"
             defaultValue={searchQuery}
             onChange={handleSearchChange}
@@ -259,7 +255,7 @@ const PolicyManagement = () => {
             style={{ backgroundColor: "#C71125", fontWeight: "bold" }}
             onClick={handleCreate}
           >
-            Create New Flight
+            Create New Policy
           </Button>
         </div>
         <TableContainer component={Paper}>
@@ -269,31 +265,19 @@ const PolicyManagement = () => {
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
                 >
-                  FlightId
+                  Policy Name
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
                   align="right"
                 >
-                  Departure Time
+                  Policy Description
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
                   align="right"
                 >
-                  Arrival Time
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ fontWeight: "bold", fontSize: "20px" }}
-                  align="right"
-                >
-                  Departure Airport
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ fontWeight: "bold", fontSize: "20px" }}
-                  align="right"
-                >
-                  Arrival Aiport
+                  Refund Percentage
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
@@ -304,33 +288,24 @@ const PolicyManagement = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {flightList.length > 0 ? (
-                flightList.map((flight) => (
-                  <StyledTableRow key={flight.FlightId}>
+              {policyList.length > 0 ? (
+                flightList.map((policy) => (
+                  <StyledTableRow key={policy.PolicyId}>
                     <StyledTableCell component="th" scope="row">
-                      <p className="font-semibold">{flight.FlightId}</p>
+                      <p className="font-semibold">{policy.PolicyName}</p>
                     </StyledTableCell>
                     <StyledTableCell
                       style={{ fontWeight: "bold" }}
                       align="right"
                     >
-                      {flight.Airline}
+                      {policy.Description}
                     </StyledTableCell>
                     <StyledTableCell align="right">
-                      {flight.DepartureDate}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {flight.ArrivalDate}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {flight.DepartureAirportName}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {flight.ArrivalAirportName}
+                      {policy.PercentageRefund}
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       <IconButton
-                        onClick={(event) => handleMenuClick(event, flight)}
+                        onClick={(event) => handleMenuClick(event, policy)}
                       >
                         <MoreHorizontalIcon />
                       </IconButton>
@@ -340,7 +315,7 @@ const PolicyManagement = () => {
               ) : (
                 <StyledTableRow>
                   <StyledTableCell colSpan={4} align="center">
-                    No flight found.
+                    No policy found.
                   </StyledTableCell>
                 </StyledTableRow>
               )}
@@ -369,96 +344,84 @@ const PolicyManagement = () => {
         </MenuItem>
       </Menu>
 
-      {/* Modal for Creating New Koi */}
       <Modal
-        open={openModalCreateFlight}
-        onClose={handleCloseModalCreateFlight}
+        open={openModalCreatePolicy}
+        onClose={handleCloseModalCreatePolicy}
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
       >
         <div className="flex items-center justify-center h-full">
           <div className="bg-white p-5 rounded shadow-md w-1/2">
             <h2 id="modal-title">
-              {isEditing ? "Edit Flight" : "Create New Flight"}
+              {isEditing ? "Edit Policy" : "Create New Policy"}
             </h2>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-2 gap-4">
                 <Controller
-                  name="flightId"
+                  name="policyName"
                   control={control}
                   defaultValue=""
                   rules={{
-                    required: "Please input flight ID",
+                    required: "Please input policy name",
                   }}
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="Flight ID"
+                      label="Policy Name"
                       variant="outlined"
                       fullWidth
                       margin="normal"
-                      error={!!errors.flightId}
-                      helperText={errors.flightId?.message}
+                      error={!!errors.policyName}
+                      helperText={errors.policyName?.message}
                     />
                   )}
                 />
-                <Controller
-                  name="airline"
+                 <Controller
+                  name="percentageRefund"
                   control={control}
                   defaultValue=""
                   rules={{
-                    required: "Please input airline",
+                    required: "Please input percentage refund",
+                    min: {
+                      value: 10,
+                      message: "The percentage refund must be at least 10%"
+                    },
+                    max: {
+                      value: 100,
+                      message: "The percentage refund must be at most 100%"
+                    }
                   }}
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="Airline"
+                      label="Percentage refund"
                       variant="outlined"
                       fullWidth
                       margin="normal"
                       type="number"
-                      error={!!errors.airline}
-                      helperText={errors.airline?.message}
+                      error={!!errors.percentageRefund}
+                      helperText={errors.percentageRefund?.message}
                     />
                   )}
                 />
                 <Controller
-                  name="departureDate"
+                  name="policyDescription"
                   control={control}
                   defaultValue=""
                   rules={{
-                    required: "Please input departure date",
+                    required: "Please input policy description",
                   }}
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="Departure Date"
+                      label="Policy Description"
                       variant="outlined"
                       fullWidth
                       margin="normal"
-                      type="datetime-local"
-                      error={!!errors.departureDate}
-                      helperText={errors.departureDate?.message}
-                    />
-                  )}
-                />
-                <Controller
-                  name="arrivalDate"
-                  control={control}
-                  defaultValue=""
-                  rules={{
-                    required: "Please input arrival date",
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Arrival Date"
-                      variant="outlined"
-                      fullWidth
-                      margin="normal"
-                      type="datetime-local"
-                      error={!!errors.arrivalDate}
-                      helperText={errors.arrivalDate?.message}
+                      multiline
+                      rows={4}
+                      error={!!errors.policyDescription}
+                      helperText={errors.policyDescription?.message}
                     />
                   )}
                 />
@@ -466,7 +429,7 @@ const PolicyManagement = () => {
               <div className="flex justify-end mt-4">
                 <Button
                   type="button"
-                  onClick={handleCloseModalCreateFlight}
+                  onClick={handleCloseModalCreatePolicy}
                   color="primary"
                   className="mr-2"
                 >

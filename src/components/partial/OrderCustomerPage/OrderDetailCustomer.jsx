@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemIcon, ListItemText, TextField, Typography } from "@mui/material";
 import useAuth from "../../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
@@ -8,6 +8,9 @@ import styles from "./order-detail.module.scss";
 import dayjs from "dayjs";
 import CircleIcon from "@mui/icons-material/Circle";
 import { CreatePaymentUrl } from "../../../api/PaymentApi";
+import { Controller, useForm } from "react-hook-form";
+import { useDropzone } from "react-dropzone";
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'; // Icon để hiển thị trước tên file
 
 function OrderDetailCustomer() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +19,16 @@ function OrderDetailCustomer() {
   const { user } = useAuth();
   const location = useLocation();
   const { orderId } = location.state || {};
+  const [openDialogCreateRefund, setOpenDialogCreateRefund] = useState(false);
+  const [openDialogRefundData, setOpenDialogRefundData] = useState(false);
+  const [files, setFiles] = useState([]);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
   const formatPriceVND = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -86,6 +99,60 @@ function OrderDetailCustomer() {
     fetchCreatePaymentUrl();
     setIsLoading(false);
   }
+
+  const handleCreateRefundRequest = async (data) => {
+    
+    if(files.length === 0) {
+      toast.error("Please input at least 1 image about your Koi condition")
+      return;
+    } 
+
+    setIsLoading(true);
+    console.log(files);
+    // const dataJson = {
+    //   length: data.length,
+    //   width: data.width,
+    //   height: data.height,
+    //   weight: data.weight,
+    // };
+    // const response = await PackOrder(dataJson, orderId);
+    // if (response.ok) {
+    //   toast.success("Pack order successfully");
+    //   fetchGetOrderDetail();
+    //   fetchGetDeliveryOfOrder();
+    // } else {
+    //   toast.error("Pack order failed");
+    // }
+    setFiles([])
+    setOpenDialogCreateRefund(false);
+    reset();
+    setIsLoading(false);
+  };
+
+  const onDrop = (acceptedFiles) => {
+    // Thêm các file mới vào danh sách file hiện có mà không ghi đè
+    setFiles(prevFiles => [
+      ...prevFiles,
+      ...acceptedFiles.map(file =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file) // Tạo URL cho hình ảnh
+        })
+      )
+    ]);
+  };
+
+
+  // Khai báo useDropzone
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': [] // Chấp nhận mọi loại hình ảnh
+    },
+    maxFiles: 5,
+    maxSize: 1048576
+  });
+
+
 
   if (isLoading || !orderId) {
     return (
@@ -215,17 +282,120 @@ function OrderDetailCustomer() {
               <div>
                 <Button
                   style={{
-                    backgroundColor: "#C71125",
+                    backgroundColor: "#DD7D01",
                     color: "white",
                     marginTop: "10px",
                     padding: "10px 30px",
+                    marginRight: '10px'
                   }}
                   onClick={() => handleConfirmOrderCustomer()}
                 >
                   Confirm Order
                 </Button>
+                <Button
+                  style={{
+                    backgroundColor: "#C71125",
+                    color: "white",
+                    marginTop: "10px",
+                    padding: "10px 30px",
+                  }}
+                  onClick={() => setOpenDialogCreateRefund(true)}
+                >
+                  Create Refund Request
+                </Button>
               </div>
             )}
+
+            {(orderDetail.status === "Processing Refund"
+              || orderDetail.status === "Accepted Refund"
+              || orderDetail.status === "Denied Refund"
+              || orderDetail.status === "Completed Refund"
+            ) && (
+                <div>
+                  <Button
+                    style={{
+                      backgroundColor: "#DD7D01",
+                      color: "white",
+                      marginTop: "10px",
+                    }}
+                    onClick={() => setOpenDialogRefundData(true)}
+                  >
+                    View Refund Request
+                  </Button>
+                </div>
+
+              )}
+
+            <Dialog open={openDialogCreateRefund} onClose={() => setOpenDialogCreateRefund(false)}>
+              <DialogTitle>Create Refund Request</DialogTitle>
+              <DialogContent  style={{paddingTop: '10px'}}>
+                <Controller
+                  name="refundDescription"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: "Please input refund request",
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Refund Description"
+                      variant="outlined"
+                      fullWidth
+                      multiline
+                      rows={5}
+                      error={!!errors.refundDescription}
+                      helperText={errors.refundDescription?.message}
+                    />
+                  )}
+                />
+
+                {/* Dropzone */}
+                <Box {...getRootProps({ className: 'dropzone' })} sx={{ mt: 2, p: 2, border: '2px dashed #cccccc', borderRadius: '4px', textAlign: 'center' }}>
+                  <input {...getInputProps()} />
+                  <Typography>
+                    Drag & drop some files here, or click to select files
+                  </Typography>
+                </Box>
+
+                {/* Hiển thị danh sách file đã chọn */}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2 }}>
+                  {files.map((file, index) => (
+                    <Box key={index} sx={{ width: 100, height: 100, position: 'relative' }}>
+                      <img
+                        src={file.preview}
+                        alt={`preview ${index}`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
+                      />
+                    </Box>
+                  ))}
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenDialogCreateRefund(false)}>Cancel</Button>
+                <Button onClick={handleSubmit(handleCreateRefundRequest)}>Create</Button>
+              </DialogActions>
+            </Dialog>
+
+
+            <Dialog open={openDialogRefundData} onClose={() => setOpenDialogRefundData(false)} fullWidth>
+              <DialogTitle>Refund Data</DialogTitle>
+              <DialogContent style={{ paddingTop: "10px" }}>
+                <Typography variant="body1"><span className="font-bold">Policy Name:</span> {orderDetail.refundPolicy.policyName}</Typography>
+                <Typography variant="body1"><span className="font-bold">Description:</span> {orderDetail.refundPolicy.description}</Typography>
+                <Typography variant="body1"><span className="font-bold">Percentage Refund:</span> {orderDetail.refundPolicy.percentageRefund}%</Typography>
+                <Box mt={2}>
+                  {orderDetail.refundRequestMedia.map(media => (
+                    <img key={media.refundRequestMediaId} src={media.link} alt="Refund Media" style={{ width: '100%', marginBottom: '10px' }} />
+                  ))}
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenDialogRefundData(false)} color="primary">
+                  Cancel
+                </Button>
+              </DialogActions>
+            </Dialog>
           </div>
         </div>
       )}

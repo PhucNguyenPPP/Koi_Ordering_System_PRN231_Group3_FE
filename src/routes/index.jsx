@@ -30,6 +30,7 @@ import OrderDetailShipperPage from "../pages/OrderShipperPage/OrderDetailShipper
 import PolicyManagementPage from "../pages/PolicyManagementPage/PolicyManagementPage";
 import RefundOrderListPage from "../pages/RefundOrderManagementPage/RefundOrderListPage";
 import HomeStaffPage from "../pages/HomePage/HomeStaffPage";
+import RefundOrderDetailPage from "../pages/RefundOrderManagementPage/RefundOrderDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -265,6 +266,15 @@ export const router = createBrowserRouter([
     element: (
       <RoleBasedGuard accessibleRoles={["Staff"]} status="Active">
         <RefundOrderListPage />
+      </RoleBasedGuard>
+    ),
+    errorElement: <Error />,
+  },
+  {
+    path: "/refund-order-detail",
+    element: (
+      <RoleBasedGuard accessibleRoles={["Staff"]} status="Active">
+        <RefundOrderDetailPage />
       </RoleBasedGuard>
     ),
     errorElement: <Error />,

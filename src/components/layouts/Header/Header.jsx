@@ -226,7 +226,8 @@ function Header() {
                         || user?.roleName == "Customer"
                         || user?.roleName == "Admin"
                         || user?.roleName == "StorageManager"
-                        || user?.roleName == "Shipper")
+                        || user?.roleName == "Shipper"
+                        || user?.roleName == "Staff")
                         ? (
                             <>
                                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>

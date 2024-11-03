@@ -11,6 +11,8 @@ import {
 import styles from "./order-detail-shipper.module.scss";
 import dayjs from "dayjs";
 import CircleIcon from "@mui/icons-material/Circle";
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+
 
 function OrderDetailShipper() {
   const [isLoading, setIsLoading] = useState(false);
@@ -132,7 +134,7 @@ function OrderDetailShipper() {
     setIsLoading(false);
   };
 
-  const handleConfirmArrivingCustomer= async () => {
+  const handleConfirmArrivingCustomer = async () => {
     const data = {
       orderId: orderId,
       shipperId: user.userId,
@@ -164,25 +166,29 @@ function OrderDetailShipper() {
         <div className={styles.itemHeader}>
           <div className={styles.shopName}>Delivery</div>
         </div>
-        {orderDeliveryList && orderDeliveryList.length > 0 ? (
-          orderDeliveryList.map((delivery, index) => (
-            <div key={index} className={styles.listItem}>
-              <span className={styles.dotIcon}>
-                <CircleIcon style={{ fontSize: "15px" }} />
-              </span>
-              <div className={styles.descriptionContainer}>
-                <p className={styles.description}>{delivery.status}</p>
-                <p className={styles.time}>
-                  {dayjs(delivery.arrivalTime).format("DD-MM-YYYY HH:mm")}
-                </p>
+        <div className="flex overflow-auto">
+          {orderDeliveryList && orderDeliveryList.length > 0 ? (
+            orderDeliveryList.map((delivery, index) => (
+              <div key={index} className={styles.listItem}>
+                <div className={styles.descriptionContainer}>
+                  <p className={styles.description}>
+                    {delivery.status}
+                    {index < orderDeliveryList.length - 1 && (
+                      <ArrowRightAltIcon style={{ marginLeft: "50px" }} />
+                    )}
+                  </p>
+                  <p className={styles.time}>
+                    {dayjs(delivery.arrivalTime).format("DD-MM-YYYY HH:mm")}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <p className="pb-5 text-center text-3xl">
-            The order is being prepared
-          </p>
-        )}
+            ))
+          ) : (
+            <p className="pb-5 text-center text-3xl">
+              The order is being prepared
+            </p>
+          )}
+        </div>
       </div>
 
       {orderDetail && (

@@ -7,12 +7,14 @@
 .sectionItemContainer {
   display: flex;
   flex-direction: column;
-  margin: 0 15%;
   background-color: white;
+  margin: 0 auto;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
   height: max-content;
+  overflow: auto;
+  width: 1000px;
 }
 
 .itemHeader {
@@ -90,7 +92,6 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-end;
-  padding-left: 40px;
   padding-right: 40px;
   padding-bottom: 20px;
 }
@@ -118,6 +119,7 @@
   align-items: center;
   margin-bottom: 10px;
   margin-left: 30px;
+  margin-right: 30px;
   font-size: 20px;
 }
 
@@ -128,6 +130,7 @@
 .descriptionContainer {
   display: flex;
   flex-direction: column;
+  width: max-content;
 }
 
 .description {

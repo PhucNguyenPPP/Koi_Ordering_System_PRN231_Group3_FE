@@ -10,7 +10,7 @@ import CircleIcon from "@mui/icons-material/Circle";
 import { CreatePaymentUrl } from "../../../api/PaymentApi";
 import { Controller, useForm } from "react-hook-form";
 import { useDropzone } from "react-dropzone";
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'; // Icon để hiển thị trước tên file
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 
 function OrderDetailCustomer() {
   const [isLoading, setIsLoading] = useState(false);
@@ -101,11 +101,11 @@ function OrderDetailCustomer() {
   }
 
   const handleCreateRefundRequest = async (data) => {
-    
-    if(files.length === 0) {
+
+    if (files.length === 0) {
       toast.error("Please input at least 1 image about your Koi condition")
       return;
-    } 
+    }
 
     setIsLoading(true);
     console.log(files);
@@ -164,29 +164,33 @@ function OrderDetailCustomer() {
 
   return (
     <div className={styles.backgroundContainer}>
-      <div className={styles.sectionItemContainer}>
+        <div className={styles.sectionItemContainer}>
         <div className={styles.itemHeader}>
           <div className={styles.shopName}>Delivery</div>
         </div>
-        {orderDeliveryList && orderDeliveryList.length > 0 ? (
-          orderDeliveryList.map((delivery, index) => (
-            <div key={index} className={styles.listItem}>
-              <span className={styles.dotIcon}>
-                <CircleIcon style={{ fontSize: "15px" }} />
-              </span>
-              <div className={styles.descriptionContainer}>
-                <p className={styles.description}>{delivery.status}</p>
-                <p className={styles.time}>
-                  {dayjs(delivery.arrivalTime).format("DD-MM-YYYY HH:mm")}
-                </p>
+        <div className="flex overflow-auto">
+          {orderDeliveryList && orderDeliveryList.length > 0 ? (
+            orderDeliveryList.map((delivery, index) => (
+              <div key={index} className={styles.listItem}>
+                <div className={styles.descriptionContainer}>
+                  <p className={styles.description}>
+                    {delivery.status}
+                    {index < orderDeliveryList.length - 1 && (
+                      <ArrowRightAltIcon style={{ marginLeft: "50px" }} />
+                    )}
+                  </p>
+                  <p className={styles.time}>
+                    {dayjs(delivery.arrivalTime).format("DD-MM-YYYY HH:mm")}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <p className="pb-5 text-center text-3xl">
-            The order is being prepared
-          </p>
-        )}
+            ))
+          ) : (
+            <p className="pb-5 text-center text-3xl">
+              The order is being prepared
+            </p>
+          )}
+        </div>
       </div>
 
       {orderDetail && (
@@ -328,7 +332,7 @@ function OrderDetailCustomer() {
 
             <Dialog open={openDialogCreateRefund} onClose={() => setOpenDialogCreateRefund(false)}>
               <DialogTitle>Create Refund Request</DialogTitle>
-              <DialogContent  style={{paddingTop: '10px'}}>
+              <DialogContent style={{ paddingTop: '10px' }}>
                 <Controller
                   name="refundDescription"
                   control={control}
@@ -346,6 +350,27 @@ function OrderDetailCustomer() {
                       rows={5}
                       error={!!errors.refundDescription}
                       helperText={errors.refundDescription?.message}
+                    />
+                  )}
+                />
+
+                 <Controller
+                  name="bankAccount"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: "Please input bank account",
+                  }}
+                  render={({ field }) => (
+                    <TextField
+                    style={{marginTop: '15px'}}
+                      {...field}
+                      label="Bank Account"
+                      variant="outlined"
+                      type="number"
+                      fullWidth
+                      error={!!errors.bankAccount}
+                      helperText={errors.bankAccount?.message}
                     />
                   )}
                 />
@@ -377,25 +402,26 @@ function OrderDetailCustomer() {
               </DialogActions>
             </Dialog>
 
-
-            <Dialog open={openDialogRefundData} onClose={() => setOpenDialogRefundData(false)} fullWidth>
-              <DialogTitle>Refund Data</DialogTitle>
-              <DialogContent style={{ paddingTop: "10px" }}>
-                <Typography variant="body1"><span className="font-bold">Policy Name:</span> {orderDetail.refundPolicy.policyName}</Typography>
-                <Typography variant="body1"><span className="font-bold">Description:</span> {orderDetail.refundPolicy.description}</Typography>
-                <Typography variant="body1"><span className="font-bold">Percentage Refund:</span> {orderDetail.refundPolicy.percentageRefund}%</Typography>
-                <Box mt={2}>
-                  {orderDetail.refundRequestMedia.map(media => (
-                    <img key={media.refundRequestMediaId} src={media.link} alt="Refund Media" style={{ width: '100%', marginBottom: '10px' }} />
-                  ))}
-                </Box>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setOpenDialogRefundData(false)} color="primary">
-                  Cancel
-                </Button>
-              </DialogActions>
-            </Dialog>
+            {orderDetail.refundPolicy && orderDetail.refundRequestMedi && (
+              <Dialog open={openDialogRefundData} onClose={() => setOpenDialogRefundData(false)} fullWidth>
+                <DialogTitle>Refund Data</DialogTitle>
+                <DialogContent style={{ paddingTop: "10px" }}>
+                  <Typography variant="body1"><span className="font-bold">Policy Name:</span> {orderDetail.refundPolicy.policyName}</Typography>
+                  <Typography variant="body1"><span className="font-bold">Description:</span> {orderDetail.refundPolicy.description}</Typography>
+                  <Typography variant="body1"><span className="font-bold">Percentage Refund:</span> {orderDetail.refundPolicy.percentageRefund}%</Typography>
+                  <Box mt={2}>
+                    {orderDetail.refundRequestMedia.map(media => (
+                      <img key={media.refundRequestMediaId} src={media.link} alt="Refund Media" style={{ width: '100%', marginBottom: '10px' }} />
+                    ))}
+                  </Box>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setOpenDialogRefundData(false)} color="primary">
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            )}
           </div>
         </div>
       )}

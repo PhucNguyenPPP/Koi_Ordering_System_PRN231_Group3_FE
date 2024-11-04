@@ -122,12 +122,13 @@ function OrderDetailCustomer() {
 
     setIsLoading(true);
     const response = await CreateRefundRequest(orderId, data, files);
+    const responseData = await response.json();
     if (response.ok) {
       toast.success("Create refund successfully");
       fetchGetOrderDetail();
       fetchGetDeliveryOfOrder();
     } else {
-      toast.error("Create refund failed");
+      toast.error("Create refund failed: " +  + responseData.message);
     }
     setFiles([])
     setOpenDialogCreateRefund(false);
@@ -333,7 +334,6 @@ function OrderDetailCustomer() {
                     View Refund Request
                   </Button>
                 </div>
-
               )}
 
             <Dialog open={openDialogCreateRefund} onClose={() => setOpenDialogCreateRefund(false)}>
@@ -444,6 +444,8 @@ function OrderDetailCustomer() {
                   <Typography variant="body1"><span className="font-bold">Policy Name:</span> {orderDetail.refundPolicy.policyName}</Typography>
                   <Typography variant="body1"><span className="font-bold">Description:</span> {orderDetail.refundPolicy.description}</Typography>
                   <Typography variant="body1"><span className="font-bold">Percentage Refund:</span> {orderDetail.refundPolicy.percentageRefund}%</Typography>
+                  <Typography variant="body1"><span className="font-bold">Refund Description:</span> {orderDetail.refundDescription}</Typography>
+                  <Typography variant="body1"><span className="font-bold">Percentage Refund:</span> {orderDetail.bankAccount}</Typography>
                   <Box mt={2}>
                     {orderDetail.refundRequestMedia.map(media => (
                       <img key={media.refundRequestMediaId} src={media.link} alt="Refund Media" style={{ width: '100%', marginBottom: '10px' }} />

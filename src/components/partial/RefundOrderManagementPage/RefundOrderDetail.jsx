@@ -18,8 +18,10 @@ import useAuth from "../../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import {
+    CompleteRefund,
     GetDeliveryOfOrder,
     GetOrderDetail,
+    ProcessRefund,
 } from "../../../api/OrderApi";
 import styles from "./refund-order-detail.module.scss";
 import dayjs from "dayjs";
@@ -86,29 +88,46 @@ function RefundOrderDetail() {
     }, [orderId]);
 
     const handleConfirm = async (data) => {
-        setIsLoading(true);
         if (isAccept === "") {
             toast.error("Please choose accept or deny")
+            return;
         }
-        console.log(data);
-        // const dataJson = {
-        //   length: data.length,
-        //   width: data.width,
-        //   height: data.height,
-        //   weight: data.weight,
-        // };
-        // const response = await PackOrder(dataJson, orderId);
-        // if (response.ok) {
-        //   toast.success("Pack order successfully");
-        //   fetchGetOrderDetail();
-        //   fetchGetDeliveryOfOrder();
-        // } else {
-        //   toast.error("Pack order failed");
-        // }
+        const dataJson = {
+            orderId: orderDetail.orderId,
+            refundResponse: data.refundResponse,
+            action: isAccept
+        };
+        setIsLoading(true);
+        const response = await ProcessRefund(dataJson);
+        const responseData = await response.json();
+        if (response.ok) {
+            toast.success("Confirm refund successfully");
+            fetchGetOrderDetail();
+            fetchGetDeliveryOfOrder();
+        } else {
+            toast.error("Confirm refund failed: " + responseData.message);
+        }
         setOpenDialog(false);
         reset();
         setIsLoading(false);
     };
+
+    const handleCompletedRefund = async () => {
+        setIsLoading(true);
+        const dataJson = {
+            orderId: orderDetail.orderId
+        }
+        const response = await CompleteRefund(dataJson);
+        const responseData = await response.json();
+        if (response.ok) {
+            toast.success("Confirm completed refund successfully");
+            fetchGetOrderDetail();
+            fetchGetDeliveryOfOrder();
+        } else {
+            toast.error("Confirm completed refund failed: " + responseData.message);
+        }
+        setIsLoading(false);
+    }
 
 
 
@@ -323,16 +342,22 @@ function RefundOrderDetail() {
                             </span>
                         </div>
 
-                        <Button
-                            style={{
-                                backgroundColor: "#DD7D01",
-                                color: "white",
-                                marginTop: "10px",
-                            }}
-                            onClick={() => setOpenDialogRefundData(true)}
-                        >
-                            View Refund Request
-                        </Button>
+                        {(orderDetail.status === "Processing Refund"
+                            || orderDetail.status === "Accepted Refund"
+                            || orderDetail.status === "Denied Refund"
+                            || orderDetail.status === "Completed Refund"
+                        ) && (
+                                <Button
+                                    style={{
+                                        backgroundColor: "#DD7D01",
+                                        color: "white",
+                                        marginTop: "10px",
+                                    }}
+                                    onClick={() => setOpenDialogRefundData(true)}
+                                >
+                                    View Refund Request
+                                </Button>
+                            )}
 
                         {orderDetail.status == "Processing Refund" && (
                             <div>
@@ -345,6 +370,21 @@ function RefundOrderDetail() {
                                     onClick={() => setOpenDialog(true)}
                                 >
                                     Confirm Refund
+                                </Button>
+                            </div>
+                        )}
+
+                        {orderDetail.status == "Accepted Refund" && (
+                            <div>
+                                <Button
+                                    style={{
+                                        backgroundColor: "#C71125",
+                                        color: "white",
+                                        marginTop: "10px",
+                                    }}
+                                    onClick={() => handleCompletedRefund()}
+                                >
+                                    Confirm Completed Refund
                                 </Button>
                             </div>
                         )}
@@ -433,6 +473,8 @@ function RefundOrderDetail() {
                         <Typography variant="body1"><span className="font-bold">Policy Name:</span> {orderDetail.refundPolicy.policyName}</Typography>
                         <Typography variant="body1"><span className="font-bold">Description:</span> {orderDetail.refundPolicy.description}</Typography>
                         <Typography variant="body1"><span className="font-bold">Percentage Refund:</span> {orderDetail.refundPolicy.percentageRefund}%</Typography>
+                        <Typography variant="body1"><span className="font-bold">Refund Description:</span> {orderDetail.refundDescription}</Typography>
+                        <Typography variant="body1"><span className="font-bold">Percentage Refund:</span> {orderDetail.bankAccount}</Typography>
                         <Box mt={2}>
                             {orderDetail.refundRequestMedia.map(media => (
                                 <img key={media.refundRequestMediaId} src={media.link} alt="Refund Media" style={{ width: '100%', marginBottom: '10px' }} />

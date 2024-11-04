@@ -19,7 +19,7 @@ import useAuth from '../../../hooks/useAuth';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import MoneyIcon from '@mui/icons-material/Money';
-import { GetRevenueByFarmManager } from '../../../api/DashboardApi';
+import { GetProfitOfCurrentYearByKoiFarm, GetRevenueByFarmManager } from '../../../api/DashboardApi';
 
 // Register necessary Chart.js components
 ChartJS.register(
@@ -79,27 +79,27 @@ function HomeKoiFarmManager() {
     //     }
     // }
 
-    // const fetchProfitOfCurrentYear = async () => {
-    //     const response = await GetProfitOfCurrentYearByAdmin(currentYear);
-    //     if (response.ok) {
-    //         const responseData = await response.json();
+    const fetchProfitOfCurrentYear = async () => {
+        const response = await GetProfitOfCurrentYearByKoiFarm(currentYear, user.farmId);
+        if (response.ok) {
+            const responseData = await response.json();
 
-    //         const profits = new Array(12).fill(0);
+            const profits = new Array(12).fill(0);
 
-    //         responseData.result.forEach((item) => {
-    //             const monthIndex = item.month - 1;
-    //             profits[monthIndex] = item.profit;
-    //         });
+            responseData.result.forEach((item) => {
+                const monthIndex = item.month - 1;
+                profits[monthIndex] = item.profit;
+            });
 
-    //         setProfitData(profits);
-    //         console.log("Error when get profit of current year")
-    //     }
-    // }
+            setProfitData(profits);
+            console.log("Error when get profit of current year")
+        }
+    }
 
 
     useEffect(() => {
         if (user) {
-            // fetchProfitOfCurrentYear();
+            fetchProfitOfCurrentYear();
             fetchRevenueByTimeRange();
             // fetchProfitByTimeRange();
         }

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemIcon, ListItemText, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, InputLabel, List, ListItem, ListItemIcon, ListItemText, MenuItem, Select, TextField, Typography } from "@mui/material";
 import useAuth from "../../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
-import { ConfirmOrderCustomer, GetDeliveryOfOrder, GetOrderDetail } from "../../../api/OrderApi";
+import { ConfirmOrderCustomer, CreateRefundRequest, GetDeliveryOfOrder, GetOrderDetail } from "../../../api/OrderApi";
 import styles from "./order-detail.module.scss";
 import dayjs from "dayjs";
 import CircleIcon from "@mui/icons-material/Circle";
@@ -11,6 +11,7 @@ import { CreatePaymentUrl } from "../../../api/PaymentApi";
 import { Controller, useForm } from "react-hook-form";
 import { useDropzone } from "react-dropzone";
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import { GetAllPolicyOfFarmByCustomer } from "../../../api/PolicyApi";
 
 function OrderDetailCustomer() {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +23,7 @@ function OrderDetailCustomer() {
   const [openDialogCreateRefund, setOpenDialogCreateRefund] = useState(false);
   const [openDialogRefundData, setOpenDialogRefundData] = useState(false);
   const [files, setFiles] = useState([]);
+  const [policyList, setPolicyList] = useState([]);
 
   const {
     control,
@@ -100,6 +102,17 @@ function OrderDetailCustomer() {
     setIsLoading(false);
   }
 
+  const handleOpenCreateRefund = async () => {
+    const response = await GetAllPolicyOfFarmByCustomer(orderDetail.farmId);
+    const responseData = await response.json();
+    if (response.ok) {
+      setPolicyList(responseData.value)
+      setOpenDialogCreateRefund(true);
+    } else {
+      console.log("Fail to fetch get policy farm");
+    }
+  }
+
   const handleCreateRefundRequest = async (data) => {
 
     if (files.length === 0) {
@@ -108,21 +121,14 @@ function OrderDetailCustomer() {
     }
 
     setIsLoading(true);
-    console.log(files);
-    // const dataJson = {
-    //   length: data.length,
-    //   width: data.width,
-    //   height: data.height,
-    //   weight: data.weight,
-    // };
-    // const response = await PackOrder(dataJson, orderId);
-    // if (response.ok) {
-    //   toast.success("Pack order successfully");
-    //   fetchGetOrderDetail();
-    //   fetchGetDeliveryOfOrder();
-    // } else {
-    //   toast.error("Pack order failed");
-    // }
+    const response = await CreateRefundRequest(orderId, data, files);
+    if (response.ok) {
+      toast.success("Create refund successfully");
+      fetchGetOrderDetail();
+      fetchGetDeliveryOfOrder();
+    } else {
+      toast.error("Create refund failed");
+    }
     setFiles([])
     setOpenDialogCreateRefund(false);
     reset();
@@ -164,7 +170,7 @@ function OrderDetailCustomer() {
 
   return (
     <div className={styles.backgroundContainer}>
-        <div className={styles.sectionItemContainer}>
+      <div className={styles.sectionItemContainer}>
         <div className={styles.itemHeader}>
           <div className={styles.shopName}>Delivery</div>
         </div>
@@ -303,7 +309,7 @@ function OrderDetailCustomer() {
                     marginTop: "10px",
                     padding: "10px 30px",
                   }}
-                  onClick={() => setOpenDialogCreateRefund(true)}
+                  onClick={() => handleOpenCreateRefund()}
                 >
                   Create Refund Request
                 </Button>
@@ -334,6 +340,35 @@ function OrderDetailCustomer() {
               <DialogTitle>Create Refund Request</DialogTitle>
               <DialogContent style={{ paddingTop: '10px' }}>
                 <Controller
+                  name="policyId"
+                  control={control}
+                  rules={{ required: "Please select policy" }}
+                  render={({ field, fieldState: { error } }) => (
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      margin="normal"
+                      error={!!error}
+                    >
+                      <InputLabel>Policy</InputLabel>
+                      <Select {...field} label="Policy">
+                        {policyList &&
+                          policyList.map((policy) => (
+                            <MenuItem
+                              key={policy.PolicyId}
+                              value={policy.PolicyId}
+                            >
+                              {policy.PolicyName}
+                            </MenuItem>
+                          ))}
+                      </Select>
+                      {error && (
+                        <FormHelperText>{error.message}</FormHelperText>
+                      )}{" "}
+                    </FormControl>
+                  )}
+                />
+                <Controller
                   name="refundDescription"
                   control={control}
                   defaultValue=""
@@ -354,7 +389,7 @@ function OrderDetailCustomer() {
                   )}
                 />
 
-                 <Controller
+                <Controller
                   name="bankAccount"
                   control={control}
                   defaultValue=""
@@ -363,7 +398,7 @@ function OrderDetailCustomer() {
                   }}
                   render={({ field }) => (
                     <TextField
-                    style={{marginTop: '15px'}}
+                      style={{ marginTop: '15px' }}
                       {...field}
                       label="Bank Account"
                       variant="outlined"
@@ -402,7 +437,7 @@ function OrderDetailCustomer() {
               </DialogActions>
             </Dialog>
 
-            {orderDetail.refundPolicy && orderDetail.refundRequestMedi && (
+            {orderDetail.refundPolicy && orderDetail.refundRequestMedia && (
               <Dialog open={openDialogRefundData} onClose={() => setOpenDialogRefundData(false)} fullWidth>
                 <DialogTitle>Refund Data</DialogTitle>
                 <DialogContent style={{ paddingTop: "10px" }}>

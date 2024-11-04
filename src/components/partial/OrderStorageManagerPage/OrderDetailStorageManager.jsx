@@ -25,7 +25,7 @@ import styles from "./order-detail-storage-manager.module.scss";
 import dayjs from "dayjs";
 import { GetAllShipperOfStorage } from "../../../api/ShipperApi";
 import CircleIcon from "@mui/icons-material/Circle";
-import { AssignFlight, GetFlightByStorageProvinceId } from "../../../api/FlightApi";
+import { AssignFlight, CreateFlight, GetFlightByStorageProvinceId } from "../../../api/FlightApi";
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 
 function OrderDetailStorageManager() {
@@ -161,13 +161,77 @@ function OrderDetailStorageManager() {
     setOpenDialogFlight(true);
   }
 
-  const handleAssignFlight = async () => {
-    if (selectedFlight) {
+  const handleAssignFlight = async (data) => {
+
+    if (!selectedFlight && data.flightCode == "" && data.airline == "" & data.departureDate == "") {
+      toast.error("Please choose available flight or add new one")
+      return;
+    }
+
+    if (!selectedFlight) {
+      if (data.flightCode == "") {
+        toast.error("Please input flight code")
+        return;
+      }
+
+      if (data.airline == "") {
+        toast.error("Please input airline")
+        return;
+      }
+
+      if (data.departureDate == "") {
+        toast.error("Please input departure date")
+        return;
+      }
+
+      if (data.arrivalDate == "") {
+        toast.error("Please input arrival date")
+        return;
+      }
+
+      const dataJson = {
+        flightCode: data.flightCode,
+        airline: data.airline,
+        departureDate: data.departureDate,
+        arrivalDate: data.arrivalDate,
+        departureAirportId: orderDetail.dpAirportId,
+        arrivalAirportId: orderDetail.arrAirportId,
+      };
+      const fetchCreateFlight = async () => {
+        const response = await CreateFlight(dataJson);
+        const responseData = await response.json();
+        if (response.ok) {
+          const data1 = {
+            orderId: orderId,
+            flightId: responseData.result,
+          };
+          const response1 = await AssignFlight(data1);
+          const responseData1 = await response1.json();
+          if (response1.ok) {
+            toast.success("Assign flight successfully");
+            fetchGetOrderDetail();
+            fetchGetDeliveryOfOrder();
+            fetchShippers();
+            reset({
+              flightCode: "",
+              airline: "",
+              departureDate: "",
+              arrivalDate: "",
+            });
+            setOpenDialogFlight(false);
+          } else {
+            toast.error(responseData1.message);
+          }
+        } else {
+          toast.error(responseData.message);
+        }
+      };
+      fetchCreateFlight();
+    } else {
       const data = {
         orderId: orderId,
         flightId: selectedFlight,
       };
-      setIsLoading(true);
       const response = await AssignFlight(data);
       const responseData = await response.json();
       if (response.ok) {
@@ -176,16 +240,19 @@ function OrderDetailStorageManager() {
         fetchGetDeliveryOfOrder();
         fetchShippers();
         setOpenDialogFlight(false);
+        reset({
+          flightCode: "",
+          airline: "",
+          departureDate: "",
+          arrivalDate: "",
+        });
       } else {
         toast.error(responseData.message);
       }
-      setIsLoading(false);
-    } else {
-      toast.error("Please select a flight");
     }
-  };
+  }
 
-  if (isLoading || !orderId) {
+  if (isLoading) {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-gray-200 z-50">
         <CircularProgress />
@@ -195,7 +262,7 @@ function OrderDetailStorageManager() {
 
   return (
     <div className={styles.backgroundContainer}>
-        <div className={styles.sectionItemContainer}>
+      <div className={styles.sectionItemContainer}>
         <div className={styles.itemHeader}>
           <div className={styles.shopName}>Delivery</div>
         </div>
@@ -490,49 +557,145 @@ function OrderDetailStorageManager() {
 
       {/* Dialog cho việc chọn flight */}
       <Dialog open={openDialogFlight} onClose={() => setOpenDialogFlight(false)} maxWidth="lg" fullWidth>
-        <DialogTitle>Assign Flight</DialogTitle>
-        <DialogContent style={{ width: "100%" }}>
-          <div>
-            <Controller
-              name="flight"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  value={selectedFlight}
-                  onChange={(e) => setSelectedFlight(e.target.value)}
-                  fullWidth
-                >
-                  {flightList &&
-                    flightList.map((flight) => (
-                      <MenuItem key={flight.flightId} value={flight.flightId}>
-                        <div style={{ display: "flex", gap: '10px' }}>
-                          <strong>Flight Code:</strong> {flight.flightCode}
-                          <strong>Airline:</strong> {flight.airline}
-                          <strong>Departure Date:</strong> {dayjs(flight.departureDate).format('DD-MM-YYYY HH:mm')}
-                          <strong>Arrival Date:</strong> {dayjs(flight.arrivalDate).format('DD-MM-YYYY HH:mm')}
-                        </div>
-                      </MenuItem>
-                    ))}
-                </Select>
-              )}
-            />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialogFlight(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAssignFlight}
-            style={{ backgroundColor: "#C71125", color: "white" }}
-          >
-            Assign
-          </Button>
-        </DialogActions>
+        <form onSubmit={handleSubmit(handleAssignFlight)}>
+          <DialogTitle>Assign Flight</DialogTitle>
+          <DialogContent style={{ width: "100%" }}>
+            <div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "16px",
+                  gap: "10px",
+                }}
+              >
+                <Controller
+                  name="flightCode"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Flight Code"
+                      variant="outlined"
+                      fullWidth
+                      error={!!errors.flightCode}
+                      helperText={errors.flightCode?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="airline"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Airline"
+                      variant="outlined"
+                      fullWidth
+                      error={!!errors.airline}
+                      helperText={errors.airline?.message}
+                    />
+                  )}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "10px",
+                }}
+              >
+                <Controller
+                  name="departureDate"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Departure Date"
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      type="datetime-local"
+                      error={!!errors.departureDate}
+                      helperText={errors.departureDate?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="arrivalDate"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Arrival Date"
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      type="datetime-local"
+                      error={!!errors.arrivalDate}
+                      helperText={errors.arrivalDate?.message}
+                    />
+                  )}
+                />
+              </div>
+              {flightList && flightList.length > 0 &&
+                (
+                  <>
+                    <p className="font-boldm mb-2">Available Flight</p>
+                    <Controller
+                      name="flight"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          value={selectedFlight}
+                          onChange={(e) => setSelectedFlight(e.target.value)}
+                          fullWidth
+                        >
+                          <MenuItem value={""}>
+                            <div style={{ display: "flex", gap: '10px', padding: '10px' }}>
+                             
+                            </div>
+                          </MenuItem>
+                          {flightList.map((flight) => (
+                            <MenuItem key={flight.flightId} value={flight.flightId}>
+                              <div style={{ display: "flex", gap: '10px' }}>
+                                <strong>Flight Code:</strong> {flight.flightCode}
+                                <strong>Airline:</strong> {flight.airline}
+                                <strong>Departure Date:</strong> {dayjs(flight.departureDate).format('DD-MM-YYYY HH:mm')}
+                                <strong>Arrival Date:</strong> {dayjs(flight.arrivalDate).format('DD-MM-YYYY HH:mm')}
+                              </div>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </>
+                )}
+
+
+
+            </div>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDialogFlight(false)} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              style={{ backgroundColor: "#C71125", color: "white" }}
+            >
+              Assign
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );
-}
-
+};
 export default OrderDetailStorageManager;

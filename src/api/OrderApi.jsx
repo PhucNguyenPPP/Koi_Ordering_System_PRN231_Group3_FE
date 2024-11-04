@@ -241,3 +241,32 @@ export const ConfirmOrderCustomer = async (orderId) => {
         console.log(err);
     }
 };
+
+export const CreateRefundRequest = async (orderId, data, imageFiles) => {
+    try {
+        const formData = new FormData();
+        console.log(imageFiles)
+        formData.append('OrderId', orderId);
+        formData.append('RefundDescription', data.description);
+        formData.append('BankAccount', data.bankAccount);
+        formData.append('PolicyId', data.policyId);
+        imageFiles.forEach((file, index) => {
+            formData.append('Images', file);
+        });
+
+        const url = `${baseUrl}/odata/create-refund`;
+        const request = {
+            method: "POST",
+            headers: {
+                'accept': '*/*',
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+            },
+            body: formData,
+        };
+        const response = await fetch(url, request);
+        
+        return response;
+    } catch (err) {
+        console.log(err);
+    }
+};

@@ -19,7 +19,7 @@ import useAuth from '../../../hooks/useAuth';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import MoneyIcon from '@mui/icons-material/Money';
-import { GetProfitOfCurrentYearByKoiFarm, GetRevenueByFarmManager } from '../../../api/DashboardApi';
+import { GetProfitByFarmManager, GetProfitOfCurrentYearByKoiFarm, GetRevenueByFarmManager } from '../../../api/DashboardApi';
 
 // Register necessary Chart.js components
 ChartJS.register(
@@ -69,15 +69,15 @@ function HomeKoiFarmManager() {
         }
     }
 
-    // const fetchProfitByTimeRange = async () => {
-    //     const response = await GetProfitByAdmin(startDate, endDate)
-    //     if (response.ok) {
-    //         const responseData = await response.json();
-    //         setProfit(responseData.result);
-    //     } else {
-    //         console.log("Error when get profit")
-    //     }
-    // }
+    const fetchProfitByTimeRange = async () => {
+        const response = await GetProfitByFarmManager(startDate, endDate, user.farmId)
+        if (response.ok) {
+            const responseData = await response.json();
+            setProfit(responseData.result);
+        } else {
+            console.log("Error when get profit")
+        }
+    }
 
     const fetchProfitOfCurrentYear = async () => {
         const response = await GetProfitOfCurrentYearByKoiFarm(currentYear, user.farmId);
@@ -101,7 +101,7 @@ function HomeKoiFarmManager() {
         if (user) {
             fetchProfitOfCurrentYear();
             fetchRevenueByTimeRange();
-            // fetchProfitByTimeRange();
+            fetchProfitByTimeRange();
         }
     }, [startDate, endDate, user])
 

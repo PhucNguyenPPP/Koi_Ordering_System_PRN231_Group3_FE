@@ -40,7 +40,7 @@ import { toast } from "react-toastify";
 import SearchIcon from "@mui/icons-material/Search";
 import { useForm, Controller, set } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { GetAllFlight } from "../../../api/FlightApi";
+import { CreatePolicy, DeletePolicy, GetAllPolicyOfFarm, UpdatePolicy } from "../../../api/PolicyApi";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -80,14 +80,14 @@ const PolicyManagement = () => {
   } = useForm();
   const navigate = useNavigate();
 
-  const fetchAllFlight = async () => {
-    const response = await GetAllFlight(searchQuery, currentPage, rowsPerPage);
+  const fetchAllPolicyOfFarm = async () => {
+    const response = await GetAllPolicyOfFarm(searchQuery, currentPage, rowsPerPage, user.farmId);
     const responseData = await response.json();
     if (response.ok) {
-      setFlightList(responseData.value);
+      setPolicyList(responseData.value);
       setTotalPage(Math.ceil(responseData["@odata.count"] / rowsPerPage));
     } else if (response.status === 404) {
-      setFlightList([]);
+      setPolicyList([]);
       setCurrentPage(0);
       setTotalPage(0);
     }
@@ -96,7 +96,7 @@ const PolicyManagement = () => {
   useEffect(() => {
     if (user) {
       setIsLoading(true);
-      fetchAllFlight();
+      fetchAllPolicyOfFarm();
       setIsLoading(false);
     }
   }, [user, searchQuery, currentPage]);
@@ -156,20 +156,20 @@ const PolicyManagement = () => {
 
   const handleCloseDeleteConfirmation = () => {
     setOpenDeleteModal(false);
-    setSelectedFlight(null);
+    setSelectedPolicy(null);
   };
 
   const handleFetchDelete = async () => {
     setIsLoading(true);
-    // const response = await DeleteKoi(selectedKoi.KoiId);
-    // if (response.ok) {
-    //   fetchAllKoiListOfFarm();
-    //   handleCloseDeleteConfirmation();
-    //   toast.success("Delete Koi successfully");
-    // } else {
-    //   const responseData = await response.json();
-    //   toast.error("Delete Koi failed: " + responseData.message);
-    // }
+    const response = await DeletePolicy(selectedPolicy.PolicyId);
+    if (response.ok) {
+      fetchAllPolicyOfFarm();
+      handleCloseDeleteConfirmation();
+      toast.success("Disable policy successfully");
+    } else {
+      const responseData = await response.json();
+      toast.error("Disable policy failed: " + responseData.message);
+    }
     setIsLoading(false);
   };
 
@@ -180,51 +180,63 @@ const PolicyManagement = () => {
     reset({
       policyId: "",
       policyName: "",
-      description:"",
+      description: "",
       percentageRefund: "",
       isBackFarm: true
     });
   };
 
   const onSubmit = (data) => {
-    // const koiData = {
-    //   ...data,
-    //   breedList: selectedBreedIds,
-    // };
-    // if (isEditing) {
-    //   const fetchUpdateKoi = async () => {
-    //     setIsLoading(true);
-    //     const response = await UpdateKoi(selectedKoi.KoiId, koiData);
-    //     if (response.ok) {
-    //       reset();
-    //       fetchAllKoiListOfFarm();
-    //       handleCloseModalCreateKoi();
-    //       toast.success("Update Koi successfully");
-    //     } else {
-    //       const responseData = await response.json();
-    //       toast.error("Update Koi failed: " + responseData.message);
-    //     }
-    //     setIsLoading(false);
-    //   };
-    //   fetchUpdateKoi();
-    // } else {
-    //   const fetchCreateKoi = async () => {
-    //     setIsLoading(true);
-    //     const response = await CreateKoi(koiData, user.farmId);
-    //     if (response.ok) {
-    //       reset();
-    //       setSelectedBreedIds([]);
-    //       toast.success("Create Koi successfully");
-    //       fetchAllKoiListOfFarm();
-    //       handleCloseModalCreateKoi();
-    //     } else {
-    //       const responseData = await response.json();
-    //       toast.error("Create Koi failed: " + responseData.message);
-    //     }
-    //     setIsLoading(false);
-    //   };
-    //   fetchCreateKoi();
-    // }
+    const dataJsonCreate = {
+      policyName: data.policyName,
+      percentageRefund: data.percentageRefund,
+      description: data.description,
+      isBackToFarm: true,
+      farmId: user.farmId,
+      status: true
+    }
+    if (isEditing) {
+      const dataJsonUpdate = {
+        policyId: selectedPolicy.PolicyId,
+        policyName: data.policyName,
+        percentageRefund: data.percentageRefund,
+        description: data.description,
+        isBackToFarm: true,
+        farmId: user.farmId,
+        status: true
+      }
+      const fetchUpdatePolicy = async () => {
+        setIsLoading(true);
+        const response = await UpdatePolicy(dataJsonUpdate);
+        if (response.ok) {
+          reset();
+          fetchAllPolicyOfFarm();
+          handleCloseModalCreatePolicy();
+          toast.success("Update policy successfully");
+        } else {
+          const responseData = await response.json();
+          toast.error("Update policy failed: " + responseData.message);
+        }
+        setIsLoading(false);
+      };
+      fetchUpdatePolicy();
+    } else {
+      const fetchCreatePolicy = async () => {
+        setIsLoading(true);
+        const response = await CreatePolicy(dataJsonCreate);
+        if (response.ok) {
+          reset();
+          toast.success("Create policy successfully");
+          fetchAllPolicyOfFarm();
+          handleCloseModalCreatePolicy();
+        } else {
+          const responseData = await response.json();
+          toast.error("Create policy failed: " + responseData.message);
+        }
+        setIsLoading(false);
+      };
+      fetchCreatePolicy();
+    }
   };
 
   const handlePageChange = (event, page) => {
@@ -269,9 +281,13 @@ const PolicyManagement = () => {
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
-                  align="right"
                 >
                   Policy Description
+                </StyledTableCell>
+                <StyledTableCell
+                  style={{ fontWeight: "bold", fontSize: "20px" }}
+                >
+                  Status
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ fontWeight: "bold", fontSize: "20px" }}
@@ -288,20 +304,20 @@ const PolicyManagement = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {policyList.length > 0 ? (
-                flightList.map((policy) => (
+              {policyList && policyList.length > 0 ? (
+                policyList.map((policy) => (
                   <StyledTableRow key={policy.PolicyId}>
                     <StyledTableCell component="th" scope="row">
                       <p className="font-semibold">{policy.PolicyName}</p>
                     </StyledTableCell>
-                    <StyledTableCell
-                      style={{ fontWeight: "bold" }}
-                      align="right"
-                    >
+                    <StyledTableCell>
                       {policy.Description}
                     </StyledTableCell>
+                    <StyledTableCell>
+                      {policy.Status ? 'Active' : 'Disable'}
+                    </StyledTableCell>
                     <StyledTableCell align="right">
-                      {policy.PercentageRefund}
+                      {policy.PercentageRefund + "%"}
                     </StyledTableCell>
                     <StyledTableCell align="right">
                       <IconButton
@@ -376,7 +392,7 @@ const PolicyManagement = () => {
                     />
                   )}
                 />
-                 <Controller
+                <Controller
                   name="percentageRefund"
                   control={control}
                   defaultValue=""
@@ -405,7 +421,7 @@ const PolicyManagement = () => {
                   )}
                 />
                 <Controller
-                  name="policyDescription"
+                  name="description"
                   control={control}
                   defaultValue=""
                   rules={{
@@ -420,8 +436,8 @@ const PolicyManagement = () => {
                       margin="normal"
                       multiline
                       rows={4}
-                      error={!!errors.policyDescription}
-                      helperText={errors.policyDescription?.message}
+                      error={!!errors.description}
+                      helperText={errors.description?.message}
                     />
                   )}
                 />

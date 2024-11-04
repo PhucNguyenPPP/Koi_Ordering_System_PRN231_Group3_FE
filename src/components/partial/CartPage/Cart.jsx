@@ -16,8 +16,8 @@ import { useNavigate } from "react-router-dom";
 const CartPage = () => {
   const [cartList, setCartList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [checkedItems, setCheckedItems] = useState([]); // Store checked IDs
-  const [selectedKois, setSelectedKois] = useState([]); // Store selected Koi objects
+  const [checkedItems, setCheckedItems] = useState([]);
+  const [selectedKois, setSelectedKois] = useState([]);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -47,14 +47,13 @@ const CartPage = () => {
       currency: "VND",
     }).format(price);
   };
-  //change github4
 
   const handleCheckboxToggle = (cartId) => {
     setCheckedItems((prevCheckedItems) => {
       if (prevCheckedItems.includes(cartId)) {
-        return prevCheckedItems.filter((id) => id !== cartId); // Uncheck
+        return prevCheckedItems.filter((id) => id !== cartId);
       } else {
-        return [...prevCheckedItems, cartId]; // Check
+        return [...prevCheckedItems, cartId];
       }
     });
 
@@ -65,6 +64,26 @@ const CartPage = () => {
       );
     } else {
       setSelectedKois((prevSelectedKois) => [...prevSelectedKois, selectedKoi]);
+    }
+  };
+
+  const handleFarmSelectAll = (farmId, isChecked) => {
+    const farmKois = cartList.filter((cart) => cart.farmId === farmId);
+    if (isChecked) {
+      const farmKoiIds = farmKois.map((cart) => cart.cartId);
+      setCheckedItems((prevCheckedItems) =>
+        [...new Set([...prevCheckedItems, ...farmKoiIds])]
+      );
+      setSelectedKois((prevSelectedKois) =>
+        [...new Set([...prevSelectedKois, ...farmKois])]
+      );
+    } else {
+      setCheckedItems((prevCheckedItems) =>
+        prevCheckedItems.filter((id) => !farmKois.some((cart) => cart.cartId === id))
+      );
+      setSelectedKois((prevSelectedKois) =>
+        prevSelectedKois.filter((koi) => koi.farmId !== farmId)
+      );
     }
   };
 
@@ -131,96 +150,67 @@ const CartPage = () => {
     );
   }
 
+  const farmsGrouped = cartList.reduce((acc, koi) => {
+    acc[koi.farmId] = acc[koi.farmId] || [];
+    acc[koi.farmId].push(koi);
+    return acc;
+  }, {});
+
   return (
     <div className={styles.cartPage}>
       <Paper className={styles.section} elevation={3}>
-        <Box display="flex" alignItems="center" padding={1}>
-
-          <Typography
-            variant="h6"
-            style={{ flex: 1, textAlign: "center", color: "#C71125" , fontWeight: "bold" }}
-          >
-            Please select Kois from the same koi farm to check out.
-          </Typography>
-        </Box>
-      </Paper>
-      <Paper className={styles.section} elevation={3}>
-        <Box display="flex" alignItems="center" padding={1}>
-          <Checkbox
-            checked={checkedItems.length === cartList.length}
-            onChange={(e) => {
-              if (e.target.checked) {
-                setCheckedItems(cartList.map((cart) => cart.cartId));
-                setSelectedKois(cartList);
-              } else {
-                setCheckedItems([]);
-                setSelectedKois([]);
-              }
-            }}
-          />
-          <Typography variant="h6" style={{ flex: 2, fontWeight: "bold" }}>
-            Product
-          </Typography>
-          <Typography
-            variant="h6"
-            style={{ flex: 1, textAlign: "right", fontWeight: "bold" }}
-          >
-            Farm
-          </Typography>
-          <Typography
-            variant="h6"
-            style={{ flex: 1, textAlign: "right", fontWeight: "bold" }}
-          >
-            Price
-          </Typography>
-          <Typography
-            variant="h6"
-            style={{ flex: 0.5, textAlign: "center", fontWeight: "bold" }}
-          >
-            Action
-          </Typography>
-        </Box>
+        <Typography variant="h6" style={{ textAlign: "center", color: "#C71125", fontWeight: "bold" }}>
+          Please select Kois from the same koi farm to check out.
+        </Typography>
       </Paper>
 
-      {cartList.map((cart) => (
-        <Paper key={cart.cartId} className={styles.section} elevation={2}>
+      {Object.entries(farmsGrouped).map(([farmId, kois]) => (
+        <Paper key={farmId} className={styles.section} elevation={3}>
           <Box display="flex" alignItems="center" padding={1}>
             <Checkbox
-              checked={checkedItems.includes(cart.cartId)}
-              onChange={() => handleCheckboxToggle(cart.cartId)}
+              checked={kois.every((cart) => checkedItems.includes(cart.cartId))}
+              onChange={(e) => handleFarmSelectAll(farmId, e.target.checked)}
             />
-            <Box display="flex" alignItems="center" flex={2}>
-              <img
-                src={cart.koiAvatar}
-                alt={cart.koiName}
-                style={{ width: "120px", height: "200px", marginRight: "10px" }}
+            <Typography variant="h6" style={{ flex: 2, fontWeight: "bold" }}>
+              {kois[0].farmName}
+            </Typography>
+          </Box>
+
+          {kois.map((cart) => (
+            <Box key={cart.cartId} display="flex" alignItems="center" padding={1}>
+              <Checkbox
+                checked={checkedItems.includes(cart.cartId)}
+                onChange={() => handleCheckboxToggle(cart.cartId)}
               />
+              <Box display="flex" alignItems="center" flex={2}>
+                <img
+                  src={cart.koiAvatar}
+                  alt={cart.koiName}
+                  style={{ width: "120px", height: "200px", marginRight: "10px" }}
+                />
+                <Typography
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                    paddingLeft: "10px",
+                  }}
+                  variant="body1"
+                >
+                  {cart.koiName}
+                </Typography>
+              </Box>
               <Typography
-                style={{
-                  fontWeight: "bold",
-                  fontSize: "20px",
-                  paddingLeft: "10px",
-                }}
                 variant="body1"
+                style={{
+                  flex: 1,
+                  textAlign: "right",
+                  color: "#C71125",
+                  fontWeight: "bold",
+                  marginRight: '30px'
+                }}
               >
-                {cart.koiName}
+                {formatPriceVND(cart.price)}
               </Typography>
-            </Box>
-            <Typography variant="body1" style={{ flex: 1, textAlign: "right" }}>
-              {cart.farmName}
-            </Typography>
-            <Typography
-              variant="body1"
-              style={{
-                flex: 1,
-                textAlign: "right",
-                color: "#C71125",
-                fontWeight: "bold",
-              }}
-            >
-              {formatPriceVND(cart.price)}
-            </Typography>
-            <Box style={{ flex: 0.5, textAlign: "center" }}>
               <Button
                 variant="outlined"
                 color="error"
@@ -229,14 +219,11 @@ const CartPage = () => {
                 Delete
               </Button>
             </Box>
-          </Box>
+          ))}
         </Paper>
       ))}
 
-      <Paper
-        className={`${styles.section} ${styles.stickyBottom}`}
-        elevation={3}
-      >
+      <Paper className={`${styles.section} ${styles.stickyBottom}`} elevation={3}>
         <div className="flex justify-end items-center">
           <p className="text-xl mr-5">
             Total Price:
